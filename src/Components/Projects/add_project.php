@@ -1,0 +1,132 @@
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+header("Access-Control-Allow-Origin: *"); // Or specify frontend URL
+header("Content-Type: application/json");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] == "OPTIONS") {
+    http_response_code(200);
+    exit();
+}
+
+$servername = "sci-project.lboro.ac.uk";
+$username = "team010";
+$password = "KsMzcqzsYEbKw4UWyvVT";
+$database = "team010";
+
+// Enable detailed error reporting for debugging
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+$conn = new mysqli($servername, $username, $password, $database, 3306);
+if ($conn->connect_error) {
+    echo json_encode(["success" => false, "message" => "Connection failed: " . $conn->connect_error]);
+    exit();
+}
+
+$data = json_decode(file_get_contents("php://input"), true);
+
+if (!$data) {
+    echo json_encode(["success" => false, "message" => "Invalid JSON data received."]);
+    exit();
+}
+
+// Validate required fields
+$requiredFields = ['title', 'description', 'teamLeader', 'projectPhases', 'tasks'];
+foreach ($requiredFields as $field) {
+    if (!isset($data[$field])) {
+        echo json_encode(["success" => false, "message" => "Missing field: $field"]);
+        exit();
+    }
+}
+
+// Initialize response array
+$response = ["success" => true, "message" => "Project added successfully"];
+
+// Assigning values from frontend data
+$title = $data['title']; 
+$description = $data['description']; 
+$teamLeader = $data['teamLeader'];
+$phases = $data['projectPhases'];
+$tasks = $data['tasks'];
+$assignments = isset($data['assignments']) ? $data['assignments'] : [];
+
+// Step 1: Insert project into Projects table
+$query = "INSERT INTO Projects (title, description, teamleader) VALUES (?, ?, ?)";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("ssi", $title, $description, $teamLeader);
+if (!$stmt->execute()) {
+    echo json_encode(["success" => false, "message" => "Project insertion failed: " . $stmt->error]);
+    exit();
+}
+$projectId = $conn->insert_id;
+
+// Step 2: Insert project phases
+if (!empty($phases)) {
+    foreach ($phases as $phase) {
+        if (!isset($phase['name'], $phase['startDate'], $phase['endDate'])) continue;
+        $phaseName = $phase['name']; 
+        $phaseStartDate = $phase['startDate'];
+        $phaseEndDate = $phase['endDate'];
+
+        $query = "INSERT INTO ProjectsTimeline (project_id, milestone, start_date, end_date, status) VALUES (?, ?, ?, ?, 'Not Started')";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("isss", $projectId, $phaseName, $phaseStartDate, $phaseEndDate);
+        if (!$stmt->execute()) {
+            $response["success"] = false;
+            $response["message"] = "Error adding project phase: " . $stmt->error;
+            echo json_encode($response);
+            exit();
+        }
+    }
+}
+
+// Step 3: Insert team assignments
+foreach ($assignments as $assignment) {
+    $employeeId = $assignment['employee_id'];  
+    $isTeamLeader = $assignment['is_team_leader'];  
+
+    $query = "INSERT INTO ProjectAssignments (project_id, employee_id, is_team_leader) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("iii", $projectId, $employeeId, $isTeamLeader);
+    
+    if (!$stmt->execute()) {
+        $response["success"] = false;
+        $response["message"] = "Error adding assignment: " . $stmt->error;
+        echo json_encode($response);
+        exit();
+    }
+}
+
+// Step 4: Insert tasks
+if (!empty($tasks)) {
+    foreach ($tasks as $task) {
+        if (!isset($task['description'], $task['assignedTo'], $task['dueDate'], $task['category'])) continue; 
+        $description = $task['description'];
+        $assignedTo = $task['assignedTo'];
+        $dueDate = $task['dueDate'];
+        $category = $task['category'];
+
+        $query = "INSERT INTO Tasks (ProjectID, Description, Status, EmployeeID, ManagerID, DueDate, Category) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?)";
+        
+        $status = "pending";   
+        $managerID = 7;  
+
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("issiiis", $projectId, $description, $status, $assignedTo, $managerID, $dueDate, $category);
+        if (!$stmt->execute()) {
+            $response["success"] = false;
+            $response["message"] = "Error adding task: " . $stmt->error;
+            echo json_encode($response);
+            exit();
+        }
+    }
+}
+
+// Final JSON response
+echo json_encode($response);
+?>
