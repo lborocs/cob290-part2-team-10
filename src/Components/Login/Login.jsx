@@ -16,24 +16,52 @@ const Login = ({ onLoginSuccess }) => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
-
-  const users = {
-    "employee@gmail.com": { password: "you", role: "Employee" },
-    "manager@gmail.com": { password: "manager", role: "Manager" },
-  };
-
-  const handleLoginSubmit = (e) => {
+  
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    const user = users[email];
-    if (user && user.password === password) {
-      onLoginSuccess(user.role);
-      navigate("/home");
-    } else if (!email.includes("@")) {
-      setError("Invalid email format. Please include an '@' symbol.");
-    } else {
-      setError("Wrong login details, please try again.");
+    setError("");
+  
+    console.log("Sending data to PHP:", { Email: email, Password: password });
+  
+    try {
+      const response = await fetch("http://localhost:8000/Components/Login/Login2.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Email: email, Password: password }), // Match PHP expected keys
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log("Received data:", data);
+  
+      if (data.db_status) {
+        console.log("Database Status:", data.db_status);
+      } else {
+        console.warn("Database status not received.");
+      }
+  
+      if (data.status === "success") {
+        console.log("Login successful");
+        console.log("User details:", data.user);
+  
+        localStorage.setItem("user", JSON.stringify(data.user)); // Store user data
+        onLoginSuccess(data.user.role);
+        navigate("/home");
+      } else {
+        setError(data.error || "Login failed");
+        console.error("Login failed:", data.error);
+      }
+    } catch (error) {
+      console.error("Fetch error:", error.message);
+      setError("A network error occurred. Please try again.");
     }
   };
+  
 
   const validatePassword = (password) => {
     return (
@@ -54,30 +82,29 @@ const Login = ({ onLoginSuccess }) => {
     }
   };
 
-  const handleForgotPasswordSubmit = (e) => {
+  const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
-    const user = users[email];
-    if (!user) {
-      setError("Email not found.");
-    } else if (user.password !== oldPassword) {
-      setError("Old password is incorrect.");
-    } else if (newPassword !== confirmPassword) {
-      setError("New passwords do not match.");
-    } else if (!validatePassword(newPassword)) {
-      setError(
-        "Password must be at least 8 characters, include uppercase and lowercase letters."
-      );
-    } else {
-      user.password = newPassword;
-      setError("");
+    setError("");
+  
+    const response = await fetch("http://localhost/forgot_password.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, oldPassword, newPassword, confirmPassword }),
+    });
+  
+    const data = await response.json();
+  
+    console.log("Database Status:", data.db_status);
+  
+    if (data.status === "success") {
       setSuccessMessage("Password changed successfully.");
-      setEmail("");
-      setOldPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      setError("");
       setIsForgotPassword(false);
+    } else {
+      setError(data.error || "Failed to reset password.");
     }
   };
+  
 
   return (
     <div className="container">
