@@ -74,7 +74,92 @@
   /* border: 0.6px solid #75777a;  */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+/*othee rpage*/
+.box-wrapper {
+  display: flex;
+  justify-content: space-around;
+  /* margin-bottom: 40px; */
+  gap: 2%;
+  background-color: white;
 
+  border-radius: 10px;
+  padding: 15px;
+  /* border: 0.6px solid #75777a;  */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Task styling */
+.task {
+  background-color: white;
+  padding: 10px;
+  margin-bottom: 10px;
+  height: 35px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Add Task Button */
+.add-task-button {
+  position: fixed;
+  top: 30px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #0a6476;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Form styling */
+.form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-wrapper {
+  background-color: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 400px;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+}
+.task {
+  cursor: pointer; /* Change cursor to pointer */
+}
+
+/* Optional: Add some hover effects for better UX */
+.task:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* Lighten background on hover */
+}
+.tasks-delete-button {
+  background: none;
+  border: none;
+  color: #acacac;
+  cursor: pointer;
+}
+
+.tasks-delete-button:hover {
+  color: #ff0000; /* Changes color to red on hover */
+}
+/*other page end*/
 /* Tasks section */
 
 .tasks-list {
