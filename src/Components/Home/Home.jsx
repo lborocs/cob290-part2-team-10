@@ -8,7 +8,7 @@ import { faBell } from "@fortawesome/free-solid-svg-icons";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./Home.css";
-import "./ToDo.css";
+import "ToDo2.css";
 //import "./ToDo.jsx";
 
 const projects = [
@@ -58,8 +58,9 @@ const projectData = [
   },
 ];
  
-//tatsks
+//tasks
 // Hardcoded initial tasks
+
 const [tasks, setTasks1] = useState({
   todo: [
     {
