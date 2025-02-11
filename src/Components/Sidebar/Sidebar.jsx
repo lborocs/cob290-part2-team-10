@@ -63,16 +63,7 @@ const Sidebar = ({ show, toggle, role, onLogout }) => {
               <FaUser className="sidebar-icon" /> <span>Profile</span>
             </Link>
           </li>
-          <li
-            className={`sidebar-item ${
-              activeLink === "/todo" ? "active-link" : ""
-            }`}
-            onClick={() => handleLinkClick("/todo")}
-          >
-            <Link to="/todo" className="sidebar-link">
-              <FaRegListAlt className="sidebar-icon" /> <span>To Do</span>
-            </Link>
-          </li>
+          
           <li
             className={`sidebar-item ${
               activeLink === "/topics" ? "active-link" : ""

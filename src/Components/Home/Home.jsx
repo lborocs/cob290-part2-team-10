@@ -312,16 +312,17 @@ const deleteTask = (taskTitle, column) => {
 
             {/* To-do List Section */}
             <div className="todo-list white-section ">
-              
+              <div  >
               <div class="row">
-              <h3 className="col-sm" >To-do List</h3>
-             
-              <button className=" col-sm" onClick={() => setIsFormOpen(true)}>{/**why on earth is this thing floating?? needs to be next to title3 in second col */}
-          Add Task
-        </button>
-</div> 
-<div class="row">
-        <div className=" box-wrapper">{/*rate of growth of this and box are different than rate of growth of white section(made htis pink to visualise*/}
+              <h3 className="col-sm" >To-do List </h3>
+              <button class="col-sm" style={{"visibility" :"hidden"}}></button>
+               <button className=" col-sm" onClick={() => setIsFormOpen(true)}>{/** needs to be next to title3 in second col */}
+                Add Task
+              </button>
+              </div> 
+         </div>
+ 
+        <div className=" box-wrapper"> 
           {/* TO DO BOX */}
           <div className="box" style={{ backgroundColor: "#BEC7E7" }}>
             <h2>TO DO</h2>
@@ -391,7 +392,7 @@ const deleteTask = (taskTitle, column) => {
             ))}
           </div>
         </div>
-
+ 
         {/* Add/Edit Task Form */}
         {isFormOpen && (
           <div className="form-overlay">
@@ -441,7 +442,8 @@ const deleteTask = (taskTitle, column) => {
         )}
 
         {/* <ToastContainer /> */}
-        </div>
+         
+         
              {/*end of list######### */}
             </div>
             {/* Post Section */}
