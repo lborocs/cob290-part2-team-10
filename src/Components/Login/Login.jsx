@@ -16,7 +16,7 @@ const Login = ({ onLoginSuccess }) => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
-  
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -24,7 +24,7 @@ const Login = ({ onLoginSuccess }) => {
     console.log("Sending data to PHP:", { Email: email, Password: password });
   
     try {
-      const response = await fetch("http://localhost:8000/Components/Login/Login2.php", {
+      const response = await fetch("http://localhost:8000/src/Components/Login/Login2.php", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
