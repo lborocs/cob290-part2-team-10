@@ -64,7 +64,7 @@ const Home = () => {
   //
   const [data, newData] = useState(null);
   useEffect(() => {
-    fetch("http://localhost:8000/testtopics.php")
+    fetch("http://localhost:3002/testtopics.php")
     .then((response) => response.json())
     .then(newData)
     .catch(error => console.error('Error fetching data:', error));
