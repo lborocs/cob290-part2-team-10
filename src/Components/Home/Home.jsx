@@ -5,6 +5,9 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import Avatar from "react-avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import "react-toastify/dist/ReactToastify.css";
+import moment from "moment";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./Home.css";
@@ -308,16 +311,17 @@ const deleteTask = (taskTitle, column) => {
             </div>
 
             {/* To-do List Section */}
-            <div className="todo-list white-section">
-              <h3>To-do List</h3>
+            <div className="todo-list white-section ">
+              
+              <div class="row">
+              <h3 className="col-sm" >To-do List</h3>
              
-
-
-              <button className="add-task-button" onClick={() => setIsFormOpen(true)}>
+              <button className=" col-sm" onClick={() => setIsFormOpen(true)}>{/**why on earth is this thing floating?? needs to be next to title3 in second col */}
           Add Task
         </button>
-
-        <div className="box-wrapper">
+</div> 
+<div class="row">
+        <div className=" box-wrapper">{/*rate of growth of this and box are different than rate of growth of white section(made htis pink to visualise*/}
           {/* TO DO BOX */}
           <div className="box" style={{ backgroundColor: "#BEC7E7" }}>
             <h2>TO DO</h2>
@@ -437,6 +441,7 @@ const deleteTask = (taskTitle, column) => {
         )}
 
         {/* <ToastContainer /> */}
+        </div>
              {/*end of list######### */}
             </div>
             {/* Post Section */}
