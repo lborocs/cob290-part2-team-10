@@ -1,5 +1,13 @@
 <?php
 #echo "pineapple";
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, OPTIONS"); // Ensure OPTIONS is handled for preflight requests
+header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow Authorization header if needed
+header("Access-Control-Allow-Credentials: true"); // Allow credentials if using sessions or cookies
+header("Content-Type: application/json");  // Ensure JSON response format
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 $Servername="sci-project.lboro.ac.uk";
 $Username="team010";
 $Password="KsMzcqzsYEbKw4UWyvVT";
@@ -49,6 +57,7 @@ $query= "INSERT INTO  `testemployeelist` ( `ID`, `firstname`, `lastname`, `role`
 
 ?>
 <?php
+#this set should be in a different file preferably
 $Servername="sci-project.lboro.ac.uk";
 $Username="team010";
 $Password="KsMzcqzsYEbKw4UWyvVT";
