@@ -15,6 +15,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "ag-charts-community": "^10.3.1",
     "ag-charts-react": "^10.3.1",
     "chart.js": "^4.4.4",
@@ -27,7 +28,6 @@
     "react-circular-progressbar": "^2.1.0",
     "react-dom": "^18.3.1",
     "react-gauge-chart": "^0.5.1",
-    "react-horizontal-timeline": "^1.5.3",
     "react-icons": "^5.3.0",
     "react-router-dom": "^6.26.2",
     "react-scripts": "^5.0.1",
@@ -36,6 +36,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "dev": "vite",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -60,7 +61,8 @@
     ]
   },
   "devDependencies": {
-    "html-webpack-plugin": "^5.6.0"
+    "html-webpack-plugin": "^5.6.0",
+    "vite": "^6.1.0"
   },
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "index.js",
