@@ -1,8 +1,8 @@
 <?php
-header("Access-Control-Allow-Origin: https://3002-idx-test5-1739208821837.cluster-rz2e7e5f5ff7owzufqhsecxujc.cloudworkstations.dev/home,https://3000-idx-test5-1739208821837.cluster-rz2e7e5f5ff7owzufqhsecxujc.cloudworkstations.dev/home,http://localhost:3000,http://localhost:3002,http://localhost:8080");
+header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST,GET,OPTIONS"); // Ensure OPTIONS is handled for preflight requests
-header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow Authorization header if needed
-header("Access-Control-Allow-Credentials: true"); // Allow credentials if using sessions or cookies
+#header("Access-Control-Allow-Headers: *"); // Allow Authorization header if needed
+#header("Access-Control-Allow-Credentials: true"); // Allow credentials if using sessions or cookies
 header("Content-Type: application/json");  // Ensure JSON response format
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
