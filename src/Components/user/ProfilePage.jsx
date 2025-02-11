@@ -45,7 +45,7 @@ const ProfilePage = ({ isAdmin }) => {
       recentActivity: "No recent activity",
     },
     {
-      id: 2,
+      id: 21,
       name: "Steven",
       email: "employee2@example.com",
       status: "No Recent Activity",

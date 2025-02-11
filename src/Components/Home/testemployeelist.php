@@ -1,7 +1,7 @@
 <?php
 #echo "pineapple";
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, OPTIONS"); // Ensure OPTIONS is handled for preflight requests
+header("Access-Control-Allow-Methods: POST,GET,OPTIONS"); // Ensure OPTIONS is handled for preflight requests
 header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow Authorization header if needed
 header("Access-Control-Allow-Credentials: true"); // Allow credentials if using sessions or cookies
 header("Content-Type: application/json");  // Ensure JSON response format

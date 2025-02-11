@@ -1,5 +1,5 @@
 // App.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -38,7 +38,6 @@ function App() {
 
   // Determine if the user is an admin based on role
   const isAdmin = role === "Manager";
-
   return (
     <div className="App">
       <Router>

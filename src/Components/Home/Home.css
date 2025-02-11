@@ -78,6 +78,14 @@ h3{
   padding: 15px;
   /* border: 0.6px solid #75777a;  */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+}.white-section2 {
+  background-color: white;
+  grid-area: 4 / 1 / 7 / 3;
+  border-radius: 10px;
+  padding: 15px;
+  /* border: 0.6px solid #75777a;  */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   overflow-wrap: normal;
 }
@@ -103,8 +111,7 @@ max-height: 259px;
   border-radius: 10px;
   padding: 15px;
   /* border: 0.6px solid #75777a;  */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-   
+    
 }
 
 /* Task styling */

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
 import Stack from "@mui/material/Stack";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart";
@@ -60,6 +61,15 @@ const projectData = [
 ];
 
 const Home = () => {
+  //
+  const [data, newData] = useState(null);
+  useEffect(() => {
+    fetch("http://localhost:3000/Components/Home/testtopics.php")
+    .then((response) => response.json())
+    .then(newData)
+    .catch(error => console.error('Error fetching data:', error));
+},[]);
+  //###########
   const [date, setDate] = useState(new Date());
  //tasks
 // Hardcoded initial tasks
@@ -67,57 +77,25 @@ const Home = () => {
 const [tasks, setTasks1] = useState({
   todo: [
     {
-      title: "Task 1",
-      description: "Task 1 description",
+      title: "edit a task!",
+      description: "Task description",
       currentProgress: "todo",
       deadline: "2024-10-20",
     },
-    {
-      title: "Task 2",
-      description: "Task 2 description",
-      currentProgress: "todo",
-      deadline: "2024-10-21",
-    },
-    {
-      title: "Task 2",
-      description: "Task 2 description",
-      currentProgress: "todo",
-      deadline: "2024-10-21",
-    },
-    {
-      title: "Task 2",
-      description: "Task 2 description",
-      currentProgress: "todo",
-      deadline: "2024-10-21",
-    },
+    
+    
   ],
   inProgress: [
     {
-      title: "Task 3",
-      description: "Task 3 description",
+      title: "edit a task!",
+      description: "Task description",
       currentProgress: "inProgress",
       deadline: "2024-10-22",
     },
-    {
-      title: "Task 2",
-      description: "Task 2 description",
-      currentProgress: "todo",
-      deadline: "2024-10-21",
-    },
+    
   ],
   done: [
-    {
-      title: "Task 4",
-      description: "Task 4 description",
-      currentProgress: "done",
-      deadline: "2024-10-15",
-    },
-    {
-      title: "Task 2",
-      description: "Task 2 description",
-      currentProgress: "todo",
-      deadline: "2024-10-21",
-    },
+    
   ],
 });
 
@@ -234,7 +212,7 @@ const deleteTask = (taskTitle, column) => {
         <div className="content">
           <div className="grid-container">
             {/* Projects Overview Section */}
-            <div className="tasks-section white-section">
+            <div className="tasks-section white-section2">
               <h3>Projects Overview</h3>
               <div className="overview-charts">
                 {/* Pie Chart for Average Completion Rate */}
@@ -311,7 +289,7 @@ const deleteTask = (taskTitle, column) => {
             </div>
 
             {/* To-do List Section */}
-            <div className="todo-list white-section ">
+            <div className="todo-list white-section2 ">
               <div  >
               <div class="row">
               <h3 className="col-sm" >To-do List </h3>
@@ -446,7 +424,10 @@ const deleteTask = (taskTitle, column) => {
          
              {/*end of list######### */}
             </div>
-            {/* Post Section */}
+            {data}
+            {/* Post Section
+            *for posts it should take data from database and read the variables one by one ig.
+            */}
             <div className="posts white-section">
               <h3>Recent Posts</h3>
               <div className="post-grid">
