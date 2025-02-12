@@ -1,16 +1,19 @@
 <?php
+session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-header("Access-Control-Allow-Origin: *"); // Or specify frontend URL
+header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-// Handle preflight OPTIONS request
-if ($_SERVER['REQUEST_METHOD'] == "OPTIONS") {
-    http_response_code(200);
-    exit();
+// Get data from frontend
+$data = json_decode(file_get_contents("php://input"), true);
+
+// Check if userID is present in the received data
+if (isset($data["userID"])) {
+    $_SESSION["userID"] = $data["userID"];  // Store userID in session
 }
 
 $servername = "sci-project.lboro.ac.uk";
@@ -27,8 +30,7 @@ if ($conn->connect_error) {
     exit();
 }
 
-$data = json_decode(file_get_contents("php://input"), true);
-
+// Validate the incoming data
 if (!$data) {
     echo json_encode(["success" => false, "message" => "Invalid JSON data received."]);
     exit();
@@ -43,18 +45,17 @@ foreach ($requiredFields as $field) {
     }
 }
 
-// Initialize response array
 $response = ["success" => true, "message" => "Project added successfully"];
 
 // Assigning values from frontend data
-$title = $data['title']; 
-$description = $data['description']; 
+$title = $data['title'];
+$description = $data['description'];
 $teamLeader = $data['teamLeader'];
 $phases = $data['projectPhases'];
 $tasks = $data['tasks'];
 $assignments = isset($data['assignments']) ? $data['assignments'] : [];
 
-// Step 1: Insert project into Projects table
+// Insert the project data into the database
 $query = "INSERT INTO Projects (title, description, teamleader) VALUES (?, ?, ?)";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("ssi", $title, $description, $teamLeader);
@@ -64,11 +65,11 @@ if (!$stmt->execute()) {
 }
 $projectId = $conn->insert_id;
 
-// Step 2: Insert project phases
+// Insert project phases
 if (!empty($phases)) {
     foreach ($phases as $phase) {
         if (!isset($phase['name'], $phase['startDate'], $phase['endDate'])) continue;
-        $phaseName = $phase['name']; 
+        $phaseName = $phase['name'];
         $phaseStartDate = $phase['startDate'];
         $phaseEndDate = $phase['endDate'];
 
@@ -84,10 +85,10 @@ if (!empty($phases)) {
     }
 }
 
-// Step 3: Insert team assignments
+// Insert team assignments
 foreach ($assignments as $assignment) {
-    $employeeId = $assignment['employee_id'];  
-    $isTeamLeader = $assignment['is_team_leader'];  
+    $employeeId = $assignment['employee_id'];
+    $isTeamLeader = $assignment['is_team_leader'];
 
     $query = "INSERT INTO ProjectAssignments (project_id, employee_id, is_team_leader) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($query);
@@ -101,10 +102,10 @@ foreach ($assignments as $assignment) {
     }
 }
 
-// Step 4: Insert tasks
+// Insert tasks
 if (!empty($tasks)) {
     foreach ($tasks as $task) {
-        if (!isset($task['description'], $task['assignedTo'], $task['dueDate'], $task['category'])) continue; 
+        if (!isset($task['description'], $task['assignedTo'], $task['dueDate'], $task['category'])) continue;
         $description = $task['description'];
         $assignedTo = $task['assignedTo'];
         $dueDate = $task['dueDate'];
@@ -112,9 +113,9 @@ if (!empty($tasks)) {
 
         $query = "INSERT INTO Tasks (ProjectID, Description, Status, EmployeeID, ManagerID, DueDate, Category) 
                   VALUES (?, ?, ?, ?, ?, ?, ?)";
-        
-        $status = "pending";   
-        $managerID = 7;  
+
+        $status = "pending";
+        $managerID = $_SESSION["userID"];
 
         $stmt = $conn->prepare($query);
         $stmt->bind_param("issiiis", $projectId, $description, $status, $assignedTo, $managerID, $dueDate, $category);
