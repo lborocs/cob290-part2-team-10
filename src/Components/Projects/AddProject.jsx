@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Projects.css";
+// Retrieve userID from localStorage
+const user = JSON.parse(localStorage.getItem("user"));
+const userID = user ? user.id : null; // Assuming user.id holds the userID
+
+
+
 
 const AddProject = () => {
   const navigate = useNavigate();
@@ -133,7 +139,8 @@ const AddProject = () => {
     // Add the assignments to formData for submission
     const projectData = {
       ...formData,
-      assignments, // Add the assignments data
+      assignments,
+      userID // Add the assignments data
     };
   
     console.log("Submitting project data:", projectData);
