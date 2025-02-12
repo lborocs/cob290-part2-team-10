@@ -20,52 +20,41 @@ const Login = ({ onLoginSuccess }) => {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setError("");
-  
-    console.log("Sending data to PHP:", { Email: email, Password: password });
-  
+
     try {
-      const response = await fetch("http://localhost:8000/src/Components/Login/Login2.php", {
+      const response = await fetch("http://localhost:8000/Login2.php", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ Email: email, Password: password }), // Match PHP expected keys
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
+
       const data = await response.json();
-      console.log("Received data:", data);
-  
-      if (data.db_status) {
-        console.log("Database Status:", data.db_status);
-      } else {
-        console.warn("Database status not received.");
-      }
-  
+
       if (data.status === "success") {
-        console.log("Login successful");
-        console.log("User details:", data.user);
-  
-        localStorage.setItem("user", JSON.stringify(data.user)); // Store user data
-        onLoginSuccess(data.user.role);
+        const userRole = data.user.role === "manager" ? "manager" : "employee"; // Ensure role mapping
+
+
+        localStorage.setItem("user", JSON.stringify(data.user)); // Store user data in localStorage
+        onLoginSuccess(userRole);
         navigate("/home");
       } else {
         setError(data.error || "Login failed");
-        console.error("Login failed:", data.error);
       }
     } catch (error) {
       console.error("Fetch error:", error.message);
       setError("A network error occurred. Please try again.");
     }
   };
-  
 
   const validatePassword = (password) => {
     return (
-      password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password)
+      password.length >= 8 &&
+      /[A-Z]/.test(password) &&
+      /[a-z]/.test(password)
     );
   };
 
@@ -85,26 +74,33 @@ const Login = ({ onLoginSuccess }) => {
   const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
     setError("");
-  
-    const response = await fetch("http://localhost/forgot_password.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, oldPassword, newPassword, confirmPassword }),
-    });
-  
-    const data = await response.json();
-  
-    console.log("Database Status:", data.db_status);
-  
-    if (data.status === "success") {
-      setSuccessMessage("Password changed successfully.");
-      setError("");
-      setIsForgotPassword(false);
-    } else {
-      setError(data.error || "Failed to reset password.");
+
+    try {
+      const response = await fetch("http://localhost/forgot_password.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          oldPassword,
+          newPassword,
+          confirmPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.status === "success") {
+        setSuccessMessage("Password changed successfully.");
+        setError("");
+        setIsForgotPassword(false);
+      } else {
+        setError(data.error || "Failed to reset password.");
+      }
+    } catch (error) {
+      console.error("Fetch error:", error.message);
+      setError("A network error occurred. Please try again.");
     }
   };
-  
 
   return (
     <div className="container">
