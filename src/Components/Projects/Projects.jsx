@@ -5,6 +5,7 @@ import { faBell } from "@fortawesome/free-solid-svg-icons";
 import Avatar from "react-avatar";
 import Sidebar from "../Sidebar/Sidebar.jsx"; // Import Sidebar component
 import { useNavigate } from 'react-router-dom'; // Correctly import useNavigate
+//const [userRole, setUserRole] = useState(""); // Store the user role
 
 const Projects = () => {
   const navigate = useNavigate();  // useNavigate hook inside the component
@@ -19,8 +20,17 @@ const Projects = () => {
     teamLeader: "",
     teamMembers: [],
     tasks: [],
-    milestones: []
+    milestones: [] 
   });
+  const user = JSON.parse(localStorage.getItem("user"));
+
+if (user) {
+  console.log("User ID:", user.id);
+  console.log("User Role:", user.role);
+} else {
+  console.log("No user found in localStorage.");
+}
+
 
   // Handle Add Project click
   const handleAddProjectClick = () => {
@@ -140,8 +150,11 @@ const Projects = () => {
               {project.title}
             </button>
           ))}
-          <button onClick={handleAddProjectClick}>+ Add Project</button>
-  
+          <div>
+    {user?.role === "manager" && (
+      <button onClick={handleAddProjectClick}>+ Add Project</button>
+    )}
+  </div>
         </div>
 
         <div className="project-info-content">
