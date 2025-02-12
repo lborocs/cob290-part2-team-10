@@ -1,6 +1,8 @@
 <?php
 // Allow cross-origin requests (for local development)
+
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin");
 header("Access-Control-Allow-Methods: POST, OPTIONS"); // Ensure OPTIONS is handled for preflight requests
 header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow Authorization header if needed
 header("Access-Control-Allow-Credentials: true"); // Allow credentials if using sessions or cookies
@@ -69,6 +71,8 @@ $user = $result->fetch_assoc();
 
 // Verify user existence and password
 if ($user && $password === $user["Password"]) {
+    // Set cookies for UserID and Role
+
     echo json_encode([
         "status" => "success",
         "db_status" => "connected", // Add this line to log connection status
@@ -76,7 +80,7 @@ if ($user && $password === $user["Password"]) {
             "id" => $user["UserID"],
             "username" => $user["Username"],
             "email" => $email,
-            "role" => $user["Role"]
+            "role" => $user["Role"] == 1 ? "manager" : "user"  // Show 'manager' or 'user'
         ]
     ]);
 } else {
