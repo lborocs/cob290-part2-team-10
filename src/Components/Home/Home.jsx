@@ -54,28 +54,28 @@ useEffect(() => {
 },[]);
   //###########
   const [date, setDate] = useState(new Date());
-
- 
+console.log("pizza");
+  console.log(post1data);
+console.log("a");
   //######
 const projectData = [{  }];
 var n=0;
-while (newData.length>0 &&n<3){
+while (post1data.length>0 &&n<3){
 
   projectData.push(
-    {title: newData[n]['title'],
-      content: newData[n]['content'],
-category: newData[n]['category'],
-image:newData[n]['image'],
-id: newData[n]['id'],
+    {title: post1data[n]['title'],
+      content: post1data[n]['content'],
+category: post1data[n]['category'],
+image:post1data[n]['image'],
+id: post1data[n]['id'],
     }
    
   ); 
   n++;
   
 };
- 
   //tasks
- //newdata1 is the list data to be iterated over
+ //listdata is the list data to be iterated over
 // Hardcoded initial tasks
 
 
@@ -86,35 +86,35 @@ const [tasks, setTasks1] = useState({
 
 });
 var i=0;
-for (  i=0;i<newData1.length;i++){
-  if(newData1[i]['currentProgress']=="todo"){
+for (  i=0;i<listdata.length;i++){
+  if(listdata[i]['currentProgress']=="todo"){
     [tasks,setTasks1].todo.push(
       
       {
-        title: newData1[i]['title'],
-        description: newData1[i]['description'],
+        title: listdata[i]['title'],
+        description: listdata[i]['description'],
         currentProgress: "todo",
-        deadline: newData1[i]['deadline'],
+        deadline: listdata[i]['deadline'],
       },
   
   )};
 
-  if (newData1[i]['currentProgress']=="InProgress"){
+  if (listdata[i]['currentProgress']=="InProgress"){
         [tasks,setTasks1].inProgress.push(
         {
-          title: newData1['title'],
-          description: newData1['description'],
+          title: listdata['title'],
+          description: listdata['description'],
           currentProgress: "inProgress",
-          deadline: newData1['deadline'],
+          deadline: listdata['deadline'],
         },)};
 
   if(newData1[i]['currentProgress']=="done"){
         [tasks,setTasks1].done.push(
         {
-        title: newData1['title'],
-          description: newData1['description'],
+        title: listdata['title'],
+          description: listdata['description'],
           currentProgress: "done",
-          deadline: newData1['deadline'],
+          deadline: listdata['deadline'],
         })
 
 };

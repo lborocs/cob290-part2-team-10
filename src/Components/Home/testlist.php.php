@@ -19,15 +19,15 @@ if (!$conn) {
 
 
   #INSERT INTO `testemployeelist` (`ID`, `firstname`, `lastname`, `role`, `email`) VALUES ('', '', '', '', '')
-enum taskstatus: string {
+enum Taskstatus: string {
  case todo = 'todo';
  case InProgress = 'InProgress';
  case Done = 'Done';
 }
 #$role = taskstatus::todo->value;
 
-#$empID=json_decode(file_get_contents("php://input"));
-$empID=2;
+$empID=json_decode(file_get_contents("php://input"));
+#$empID=2;
 $query= "Select * from `To-Do-List` where `employeeID`=".$empID ; 
 
  #employeeid (needs querying to compare, task id, titl, desc,progr,deadl)
@@ -35,19 +35,19 @@ $query= "Select * from `To-Do-List` where `employeeID`=".$empID ;
 $tryjsoning=array();
   try{
       $result=mysqli_query($conn, $query);
-      echo mysqli_num_rows($result);
+     # echo mysqli_num_rows($result);
       for ( $i=0;$i<mysqli_num_rows($result);$i++ ){
     $row = mysqli_fetch_array($result);
            $a=array(   'employeeID'=>$row[0], 'TaskID'=>$row[1], 'title'=>$row[2], 'description'=>$row[3],    'currentProgress'=>$row[4], 'deadline'=>$row[5] );
           $tryjsoning[$i]=$a;
 
 
-          echo "$row[2]"; 
+         # echo "$row[2]"; 
     }
       
      
     mysqli_close($conn); 
-     # echo "nah";
+
   } catch(exception) {
     echo "Error: " . $query . "<br>" . mysqli_error($conn);
   }
