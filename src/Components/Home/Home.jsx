@@ -62,9 +62,10 @@ const projectData = [
 
 const Home = () => {
   //
-  const [data, newData] = useState(null);
+  const [post1data, newData] = useState(null);
+  let url="http://localhost/testtopics.php"
   useEffect(() => {
-    fetch("http://localhost:8000/testtopics.php")
+      fetch(url,{headers:{accept:"application/json" }} )
     .then((response) => response.json())
     .then(newData)
     .catch(error => console.error('Error fetching data:', error));
@@ -424,7 +425,7 @@ const deleteTask = (taskTitle, column) => {
          
              {/*end of list######### */}
             </div>
-            {data}
+            {post1data}
             {/* Post Section
             *for posts it should take data from database and read the variables one by one ig.
             */}
