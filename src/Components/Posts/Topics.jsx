@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaThumbsUp, FaComments, FaPlus } from "react-icons/fa";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
@@ -8,49 +8,8 @@ import Sidebar from "../Sidebar/Sidebar.jsx";
 import Home from "../Home/Home.jsx";
 
 const Topics = () => {
-  const [topics, setTopics] = useState([
-    {
-      title: "Understanding React Hooks",
-      content:
-        "React hooks are a way to use state and lifecycle features in functional components.",
-      category: "Technical",
-      image: "https://miro.medium.com/v2/resize:fit:900/0*iTuEmxLD1IOJ5Xf1.png", // Example image URL
-      id: 1,
-    },
-    {
-      title: "JavaScript ES6 Features",
-      content: "Learn about the new features introduced in ES6.",
-      category: "Technical",
-      image:
-        "https://media.licdn.com/dms/image/v2/D4D12AQHeu6x2jIurgw/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1702274710606?e=1735776000&v=beta&t=uic0nenAC1uAybIjvCjU8s_N4xNfFX8r6kFwM3pStvk", // Example image URL
-      id: 2,
-    },
-    {
-      title: "The Future of Web Development",
-      content:
-        "Exploring trends and technologies shaping the future of web development.",
-      category: "Non-Technical",
-      image:
-        "https://media.licdn.com/dms/image/D4E12AQF2nlfXoZK2Yw/article-cover_image-shrink_600_2000/0/1675704281846?e=2147483647&v=beta&t=Rs9ejfu9oorJGUiudx8OkCEx0JKdFPsa_WIx0qmtS4Y", // Example image URL
-      id: 3,
-    },
-    {
-      title: "Building Responsive Layouts",
-      content: "Techniques to build layouts that work on various screen sizes.",
-      category: "Technical",
-      image:
-        "https://miro.medium.com/v2/resize:fit:1200/1*DUJB-gvWl-HFYb0AXEgJeg.png", // Example image URL
-      id: 4,
-    },
-    {
-      title: "Effective Time Management",
-      content: "Strategies for managing your time effectively.",
-      category: "Non-Technical",
-      image:
-        "https://media.licdn.com/dms/image/C5612AQHvsiX7SH50Kg/article-cover_image-shrink_600_2000/0/1520128073704?e=2147483647&v=beta&t=zbrzkwQ55a9SErqIgpr-6em7EjrkovtgHI-P65N-3Jg", // Example image URL
-      id: 5,
-    },
-  ]);
+  // UPDATED: Initialize topics as an empty array so that fetched data replaces it
+  const [topics, setTopics] = useState([]);
 
   const [newTopicTitle, setNewTopicTitle] = useState("");
   const [newTopicContent, setNewTopicContent] = useState("");
@@ -61,31 +20,71 @@ const Topics = () => {
   const [comments, setComments] = useState({});
   const [likes, setLikes] = useState({});
   const [filter, setFilter] = useState("");
+  const [clicked, setClicked] = useState(false);
+
+  // NEW: Fetch topics from the backend on component mount
+  useEffect(() => {
+    fetch("http://localhost:8080/get_topics.php")
+      .then((response) => response.json())
+      .then((data) => {
+        setTopics(data); // Update topics state with data from the database
+        // Initialize likes and comments from fetched topics
+        const likesData = {};
+        const commentsData = {};
+        data.forEach((topic) => {
+          likesData[topic.id] = topic.likes || 0;
+          commentsData[topic.id] = topic.comments || [];
+        });
+        setLikes(likesData);
+        setComments(commentsData);
+      })
+      .catch((error) => console.error("Error fetching topics:", error));
+  }, []);
 
   const toggleAddTopic = () => {
     setIsAddTopicOpen(!isAddTopicOpen);
-    setClicked(!clicked); // Toggle the button state
+    setClicked(!clicked);
   };
-
-  const [clicked, setClicked] = useState(false); // New state for button
 
   const handleAddTopic = () => {
     if (newTopicTitle && newTopicContent && newTopicCategory) {
+      // Create the topic object (id will be assigned by the database)
       const newTopic = {
         title: newTopicTitle,
         content: newTopicContent,
         image: newTopicImage,
         category: newTopicCategory,
-        id: Date.now(),
+        likes: 0,
+        comments: [],
       };
-      setTopics([...topics, newTopic]);
-      setNewTopicTitle("");
-      setNewTopicContent("");
-      setNewTopicImage(null);
-      setNewTopicCategory("");
-      setIsAddTopicOpen(false);
-      setLikes({ ...likes, [newTopic.id]: 0 });
-      setComments({ ...comments, [newTopic.id]: [] });
+
+      fetch("http://localhost:8080/add_topics.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newTopic),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Set the returned id to the topic
+            newTopic.id = data.topicId;
+            setTopics([...topics, newTopic]);
+            // Also update local likes and comments state for the new topic
+            setLikes((prev) => ({ ...prev, [newTopic.id]: 0 }));
+            setComments((prev) => ({ ...prev, [newTopic.id]: [] }));
+          } else {
+            alert("Failed to add topic: " + data.message);
+          }
+          setNewTopicTitle("");
+          setNewTopicContent("");
+          setNewTopicImage(null);
+          setNewTopicCategory("");
+          setIsAddTopicOpen(false);
+        })
+        .catch((error) => {
+          console.error("Error adding topic:", error);
+          alert("An error occurred. Please check console logs.");
+        });
     }
   };
 
@@ -100,19 +99,44 @@ const Topics = () => {
     }
   };
 
+  // Update the topic in the database when a like or comment is made
+  const updateTopicInDatabase = (topicId, updatedLikes, updatedComments) => {
+    const updateData = {
+      topicId,
+      likes: updatedLikes,
+      comments: updatedComments,
+    };
+
+    // UPDATED: Correct URL with colon in the fetch request
+    fetch("http://localhost:8080/update_topic.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updateData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Updated topic:", data);
+      })
+      .catch((error) => {
+        console.error("Error updating topic:", error);
+      });
+  };
+
   const handleLike = (topicId) => {
-    setLikes((prevLikes) => ({
-      ...prevLikes,
-      [topicId]: (prevLikes[topicId] || 0) + 1,
-    }));
+    const newLikes = (likes[topicId] || 0) + 1;
+    setLikes((prev) => ({ ...prev, [topicId]: newLikes }));
+    // Update the database with the new like count; preserve existing comments
+    const topicComments = comments[topicId] || [];
+    updateTopicInDatabase(topicId, newLikes, topicComments);
   };
 
   const handleAddComment = (topicId, commentText) => {
     if (commentText) {
-      setComments((prevComments) => ({
-        ...prevComments,
-        [topicId]: [...(prevComments[topicId] || []), commentText],
-      }));
+      const updatedComments = [...(comments[topicId] || []), commentText];
+      setComments((prev) => ({ ...prev, [topicId]: updatedComments }));
+      // Update the database with the new comments; preserve current likes
+      const currentLikes = likes[topicId] || 0;
+      updateTopicInDatabase(topicId, currentLikes, updatedComments);
     }
   };
 
@@ -133,15 +157,12 @@ const Topics = () => {
     return topic.category === filter;
   });
 
-  const recentTopics = topics.slice(-3).reverse();
-
   return (
     <div className="main-topics-container">
       <main className="topics-content">
         <div className="user-info">
           <FontAwesomeIcon icon={faBell} className="bell-icon" />
           <Avatar name="Alice" round={true} size="50" color="#0a6476" />
-          {/* <span className="user-name">Alice / Backend Developer</span> */}
         </div>
 
         <h1 className="topics-header">POSTS</h1>
@@ -177,9 +198,7 @@ const Topics = () => {
                   )}
                   <h2>{topic.title}</h2>
                   <p>{topic.content}</p>
-                  <span
-                    className={`category-label ${topic.category.toLowerCase()}`}
-                  >
+                  <span className={`category-label ${topic.category.toLowerCase()}`}>
                     {topic.category}
                   </span>
 
@@ -217,9 +236,7 @@ const Topics = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <h2>{expandedTopic.title}</h2>
-              <span
-                className={`category-label ${expandedTopic.category.toLowerCase()}`}
-              >
+              <span className={`category-label ${expandedTopic.category.toLowerCase()}`}>
                 {expandedTopic.category}
               </span>
               <p>{expandedTopic.content}</p>
@@ -244,6 +261,8 @@ const Topics = () => {
                 )}
                 <div className="add-comment">
                   <input
+                    id="addComment"
+                    name="addComment"
                     type="text"
                     placeholder="Add a comment..."
                     onKeyDown={(e) => {
@@ -265,22 +284,27 @@ const Topics = () => {
             <div className="add-topic-form">
               <input
                 type="text"
+                id="topicTitle"
+                name="topicTitle"
                 placeholder="Topic Title"
                 value={newTopicTitle}
                 onChange={(e) => setNewTopicTitle(e.target.value)}
               />
               <textarea
+                id="topicContent"
+                name="topicContent"
                 placeholder="Write something about the topic..."
                 value={newTopicContent}
                 onChange={(e) => setNewTopicContent(e.target.value)}
               ></textarea>
               <input
+                id="topicImage"
+                name="topicImage"
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
               />
 
-              {/* Category selection buttons */}
               <div className="category-buttons">
                 <button
                   className={newTopicCategory === "Technical" ? "selected" : ""}
@@ -289,9 +313,7 @@ const Topics = () => {
                   Technical
                 </button>
                 <button
-                  className={
-                    newTopicCategory === "Non-Technical" ? "selected" : ""
-                  }
+                  className={newTopicCategory === "Non-Technical" ? "selected" : ""}
                   onClick={() => setNewTopicCategory("Non-Technical")}
                 >
                   Non-Technical
