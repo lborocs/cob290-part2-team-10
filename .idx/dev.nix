@@ -3,6 +3,7 @@
   packages = [
     pkgs.nodejs_20
     pkgs.yarn
+    pkgs.php
   ];
   idx.extensions = [
     "svelte.svelte-vscode"

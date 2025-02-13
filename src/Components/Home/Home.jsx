@@ -12,6 +12,7 @@ import moment from "moment";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./Home.css";
+import { TitleTwoTone } from "@mui/icons-material";
 
 const projects = [
   { name: "Shop Inventory", totalTasks: 20, completedTasks: 15 },
@@ -32,73 +33,93 @@ const collaboratorColors = {
   Steven: "#B7DBD1",
 };
 
-const projectData = [
-  {
-    title: "Understanding React Hooks",
-    content:
-      "React hooks are a way to use state and lifecycle features in functional components.",
-    category: "Technical",
-    image: "https://miro.medium.com/v2/resize:fit:900/0*iTuEmxLD1IOJ5Xf1.png", // Example image URL
-    id: 1,
-  },
-  {
-    title: "JavaScript ES6 Features",
-    content: "Learn about the new features introduced in ES6.",
-    category: "Technical",
-    image:
-      "https://media.licdn.com/dms/image/v2/D4D12AQHeu6x2jIurgw/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1702274710606?e=1735776000&v=beta&t=uic0nenAC1uAybIjvCjU8s_N4xNfFX8r6kFwM3pStvk", // Example image URL
-    id: 2,
-  },
-  {
-    title: "The Future of Web Development",
-    content:
-      "Exploring trends and technologies shaping the future of web development.",
-    category: "Non-Technical",
-    image:
-      "https://media.licdn.com/dms/image/D4E12AQF2nlfXoZK2Yw/article-cover_image-shrink_600_2000/0/1675704281846?e=2147483647&v=beta&t=Rs9ejfu9oorJGUiudx8OkCEx0JKdFPsa_WIx0qmtS4Y", // Example image URL
-    id: 3,
-  },
-];
 
 const Home = () => {
   //
   const [post1data, newData] = useState(null);
-  let url="http://localhost/testtopics.php"
+  let url="http://localhost:3001/testtopics.php"
   useEffect(() => {
       fetch(url,{headers:{accept:"application/json" }} )
     .then((response) => response.json())
     .then(newData)
     .catch(error => console.error('Error fetching data:', error));
 },[]);
+const [listdata, newData1] = useState(null);
+let url2="http://localhost:3001/testlist.php.php"
+useEffect(() => {
+    fetch(url2,{headers:{accept:"application/json" }} )
+  .then((response) => response.json())
+  .then(newData1)
+  .catch(error => console.error('Error fetching data2:', error));
+},[]);
   //###########
   const [date, setDate] = useState(new Date());
- //tasks
+
+ 
+  //######
+const projectData = [{  }];
+var n=0;
+while (newData.length>0 &&n<3){
+
+  projectData.push(
+    {title: newData[n]['title'],
+      content: newData[n]['content'],
+category: newData[n]['category'],
+image:newData[n]['image'],
+id: newData[n]['id'],
+    }
+   
+  ); 
+  n++;
+  
+};
+ 
+  //tasks
+ //newdata1 is the list data to be iterated over
 // Hardcoded initial tasks
+
 
 const [tasks, setTasks1] = useState({
   todo: [
-    {
-      title: "edit a task!",
-      description: "Task description",
-      currentProgress: "todo",
-      deadline: "2024-10-20",
-    },
-    
-    
-  ],
-  inProgress: [
-    {
-      title: "edit a task!",
-      description: "Task description",
-      currentProgress: "inProgress",
-      deadline: "2024-10-22",
-    },
-    
-  ],
-  done: [
-    
-  ],
+      ],
+    inProgress:[], done:[]
+
 });
+var i=0;
+for (  i=0;i<newData1.length;i++){
+  if(newData1[i]['currentProgress']=="todo"){
+    [tasks,setTasks1].todo.push(
+      
+      {
+        title: newData1[i]['title'],
+        description: newData1[i]['description'],
+        currentProgress: "todo",
+        deadline: newData1[i]['deadline'],
+      },
+  
+  )};
+
+  if (newData1[i]['currentProgress']=="InProgress"){
+        [tasks,setTasks1].inProgress.push(
+        {
+          title: newData1['title'],
+          description: newData1['description'],
+          currentProgress: "inProgress",
+          deadline: newData1['deadline'],
+        },)};
+
+  if(newData1[i]['currentProgress']=="done"){
+        [tasks,setTasks1].done.push(
+        {
+        title: newData1['title'],
+          description: newData1['description'],
+          currentProgress: "done",
+          deadline: newData1['deadline'],
+        })
+
+};
+};//#for loop
+
 
 const [isFormOpen, setIsFormOpen] = useState(false);
 const [newTask, setNewTask] = useState({
@@ -426,6 +447,7 @@ const deleteTask = (taskTitle, column) => {
              {/*end of list######### */}
             </div>
             {post1data}
+            {listdata}
             {/* Post Section
             *for posts it should take data from database and read the variables one by one ig.
             */}
