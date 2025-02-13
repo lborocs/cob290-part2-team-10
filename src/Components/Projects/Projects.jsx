@@ -39,22 +39,25 @@ if (user) {
 
   // Fetch projects and employees
   useEffect(() => {
-    fetch("http://localhost:8000/get_projects.php")
+    const user = JSON.parse(localStorage.getItem("user"));
+  
+    if (!user || !user.id) {
+      console.error("No user found in localStorage.");
+      return;
+    }
+  
+    fetch(`http://localhost:8000/get_projects.php?UserID=${user.id}`)
       .then((response) => response.json())
       .then((data) => {
-        setProjects(data.projects);
-        setActiveProject(data.projects.length > 0 ? data.projects[0] : null);
+        if (data.projects) {
+          setProjects(data.projects);
+          setActiveProject(data.projects.length > 0 ? data.projects[0] : null);
+        } else {
+          console.error("Error fetching projects:", data.error);
+        }
         setLoading(false);
       })
       .catch((error) => console.error("Error fetching projects:", error));
-
-    // Fetch employees for the dropdown
-    fetch("http://localhost:8000/get_employees.php")
-      .then((response) => response.json())
-      .then((data) => {
-        setEmployees(data.employees);
-      })
-      .catch((error) => console.error("Error fetching employees:", error));
   }, []);
 
   // Handle selecting a project
