@@ -37,15 +37,15 @@ const collaboratorColors = {
 const Home = () => {
   //
   const [post1data, newData] = useState(null);
-  let url="http://localhost:8000/testtopics.php"
+  let url="http://localhost:3000/testtopics.php"
   useEffect(() => {
       fetch(url,{headers:{accept:"application/json" }} )
-    .then((response) => response.json())
+    .then((response) => response.text())
     .then(newData)
     .catch(error => console.error('Error fetching data:', error));
 },[]);
 const [listdata, newData1] = useState(null);
-let url2="http://localhost:8000/testlist.php.php"
+let url2="http://localhost:3001/testlist.php.php"
 useEffect(() => {
     fetch(url2,{headers:{accept:"application/json" }} )
   .then((response) => response.json())
