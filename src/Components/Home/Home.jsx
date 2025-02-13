@@ -446,9 +446,10 @@ const deleteTask = (taskTitle, column) => {
          
              {/*end of list######### */}
             </div>
-            {post1data}
-            {listdata}
+            
             {/* Post Section
+            *{post1data}
+            *{listdata}
             *for posts it should take data from database and read the variables one by one ig.
             */}
             <div className="posts white-section">
