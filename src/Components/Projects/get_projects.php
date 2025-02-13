@@ -31,11 +31,18 @@ if ($conn->connect_error) {
 }
 
 // Fetch projects
+// Get UserID from the request
+$UserID = isset($_GET['UserID']) ? intval($_GET['UserID']) : 0; 
+
+// Fetch only projects assigned to this user
 $sql = "SELECT p.id, p.title, p.description, p.teamleader, e.Name AS team_leader
         FROM Projects p
-        LEFT JOIN Employee e ON p.teamleader = e.UserID";
+        LEFT JOIN Employee e ON p.teamleader = e.UserID
+        JOIN ProjectAssignments pa ON p.id = pa.project_id
+        WHERE pa.employee_id = $UserID";
 
 $result = $conn->query($sql);
+
 
 $projects = [];
 
