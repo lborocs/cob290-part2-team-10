@@ -15,7 +15,7 @@
   display: grid;
   height: 88vh;
   grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-rows: repeat(5, 1fr);
   grid-column-gap: 15px;
   grid-row-gap: 5px;
 }
@@ -24,7 +24,7 @@
 .backlog-card,
 .task-performance-report-card,
 .task-timeline-card,
-.task-pie-chart-card {
+.emp-analysis-charts-card {
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   background-color: white;
   border-radius: 10px;
@@ -44,7 +44,7 @@
   padding-top: 5px;
   padding: 20px;
   padding-bottom: 0px;
-  height: 40vh;
+  /* height: 40vh; */
   overflow-y: auto; /* Enable vertical scrolling */
   overflow-x: hidden; /* Disable horizontal scrolling */
 }
@@ -73,7 +73,7 @@
   font-weight: 500;
   letter-spacing: 0.5px;
   color: rgb(35, 33, 33);
-  font-size: 18px;
+  font-size: 16px;
   transition: background-color 0.3s ease;
 }
 
@@ -83,24 +83,142 @@
 }
 /* Task Timeline Chart Card Styles */
 .task-timeline-card {
+  overflow: auto;
+  /* display: flex; */
   background-color: #ffffff; /* Yellow background */
   padding: 0 20px;
   border-radius: 10px;
   flex: 1;
   min-width: 300px;
-  grid-area: 4 / 1 / 7 / 5;
+  grid-area: 4 / 1 / 6 / 5;
+  gap: 5%;
+  flex-direction: row;
 }
 
-/* Task Distribution Pie Chart Card */
-.task-pie-chart-card {
-  background-color: #ffffff; /* Yellow background */
-  padding: 20px;
+.project-filter-container h3 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  letter-spacing: 2px;
+  color: #75777a;
+  text-transform: uppercase;
+  margin-left: 1%;
+}
+.project-filter-container {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+  border-radius: 8px;
+  padding-top: 15px;
+  padding-right: 10px;
+
+  /* gap: 60px; */
+}
+
+.project-filter select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+.project-overview {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  gap: 30px;
+}
+
+.project-details {
+  flex: 1; /* Takes up the left side */
+  padding: 5px;
+  background-color: white;
   border-radius: 10px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  max-width: 50%;
+}
+
+.project-timeline {
+  flex: 1; /* Takes up the right side */
+  padding: 5px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  max-width: 50%;
+  margin-bottom: 5px;
+  /* overflow-y: auto; Enable scrolling if necessary */
+  max-height: 100%; /* Adjust as needed */
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.timeline-item {
+  border-left: 3px solid #0a6476;
+  padding-left: 15px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.timeline-item h4 {
+  margin: 5px 0;
+  font-weight: bold;
+}
+
+.timeline-item p {
+  margin: 2px 0;
+}
+
+.timeline-item.completed {
+  color: green;
+  border-color: green;
+}
+
+.timeline-item.in-progress {
+  color: orange;
+  border-color: orange;
+}
+
+.timeline-item.not-started {
+  color: red;
+  border-color: red;
+}
+
+.task-summary-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.task-summary-chart {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
   overflow: auto;
-  min-width: 300px;
-  /* height: 80vh; */
-  grid-area: 1 / 5 / 7 / 7;
+}
+
+.task-summary-chart canvas {
+  max-width: 250px !important;
+  max-height: 250px !important;
+}
+
+.scrollable-container {
+  max-height: 350px;
+  overflow-y: auto;
+  padding: 10px;
 }
 
 .line-chart-container {
@@ -110,12 +228,78 @@
   height: 300px;
   overflow-y: auto;
 }
-.pie-chart-container {
+
+/* Wrapper div for both charts */
+.emp-analysis-charts-card {
   display: flex;
-  justify-content: center;
-  margin-top: 40px;
-  height: 450px;
-  overflow-y: auto;
+  background-color: #ffffff; /* Yellow background */
+  padding: 20px;
+  border-radius: 10px;
+  flex: 1;
+  overflow: auto;
+  min-width: 300px;
+  grid-area: 1 / 5 / 6 / 7;
+  flex-direction: column; /* Column layout */
+  width: 90%;
+  max-width: 1200px;
+}
+.emp-analysis-charts-card h3 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  letter-spacing: 2px;
+  color: #75777a;
+  text-transform: uppercase;
+  margin-left: 1%;
+}
+.filter-container {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.filter-container label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.filter-container select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+/* Task Table */
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.task-table th,
+.task-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.task-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+/* Individual chart containers */
+.chart-container {
+  width: 100%;
+  background: #ffffff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure charts take full width */
+.chart-container canvas {
+  width: 100% !important;
+  height: auto !important;
 }
 
 /* Add Task Form */
@@ -150,6 +334,7 @@
   padding: 20px;
   border-radius: 10px;
   margin-top: 10px;
+  overflow: auto;
 }
 .task-performance-report-card h3 {
   font-size: 20px;
@@ -165,6 +350,27 @@
 }
 .task-performance-report-card ul {
   padding-left: 2%;
+}
+.training-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.training-table th,
+.training-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.training-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.training-table td {
+  font-size: 14px;
 }
 
 .toggle-report-button {

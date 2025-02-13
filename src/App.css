@@ -2,7 +2,7 @@
 .App {
   display: flex;
   flex-direction: row;
-  height: 100vh; /* Full height of viewport */
+  height: 100%; /* Full height of viewport */
 }
 
 /* Flex container for sidebar and main content */
