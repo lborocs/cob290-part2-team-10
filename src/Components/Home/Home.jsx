@@ -40,7 +40,7 @@ const Home = () => {
   let url="http://localhost:3000/testtopics.php"
   useEffect(() => {
       fetch(url,{headers:{accept:"application/json" }} )
-    .then((response) => response.text())
+    .then((response) => response.json())
     .then(newData)
     .catch(error => console.error('Error fetching data:', error));
 },[]);
