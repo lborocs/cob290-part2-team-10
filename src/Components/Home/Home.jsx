@@ -277,7 +277,7 @@ const deleteTask = (taskTitle, column) => {
               <div className="overview-charts">
                 {/* Pie Chart for Average Completion Rate */}
                 <div className="average-completion-pie">
-         <Typography>Your Efficiency</Typography>
+         <Typography>Project Completion Efficiency</Typography>
                   <PieChart
                     series={[
                       {
