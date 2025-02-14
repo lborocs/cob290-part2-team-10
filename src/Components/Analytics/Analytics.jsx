@@ -205,71 +205,6 @@ const Analytics = () => {
           </ul>
         </div>
 
-        {/* Task Timeline Chart Card */}
-        <div className="task-timeline-card">
-          {/* Project Filter Section */}
-          <div className="project-filter-container">
-            <h3>Detailed Project Overview</h3>
-            <select
-              onChange={(e) => setSelectedProject(e.target.value)}
-              value={selectedProject}
-            >
-              <option value="">-- Select Project --</option>
-              {projects.map((project) => (
-                <option key={project.ProjectID} value={project.ProjectID}>
-                  {project.ProjectTitle} (ID: {project.ProjectID})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Grid Layout for Project Info and Timeline */}
-          {projectDetails && (
-            <div className="project-overview">
-              {/* Left: Project Details */}
-              <div className="project-details">
-                <h2>Project Details</h2>
-                <p>
-                  <strong>Project Title:</strong> {projectDetails.ProjectTitle}
-                </p>
-                <p>
-                  <strong>Team Leader:</strong> {projectDetails.TeamLeader}
-                </p>
-                <p>
-                  <strong>Team Members:</strong>{" "}
-                  {projectDetails.TeamMembers.join(", ")}
-                </p>
-                <p>
-                  <strong>Task Completion:</strong>{" "}
-                  {projectDetails.CompletedTasks} / {projectDetails.TotalTasks}
-                </p>
-              </div>
-
-              {/* Right: Project Timeline */}
-              <div className="project-timeline">
-                <h2>Project Timeline</h2>
-                <div className="timeline">
-                  {projectDetails.Timeline.map((milestone, index) => (
-                    <div
-                      key={index}
-                      className={`timeline-item ${milestone.status
-                        .toLowerCase()
-                        .replace(/\s+/g, "-")}`}
-                    >
-                      <h4>{milestone.milestone}</h4>
-                      <p>
-                        {milestone.start_date} - {milestone.end_date}
-                      </p>
-                      <p>
-                        <strong>Status:</strong> {milestone.status}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
         <div className="emp-analysis-charts-card">
           <h3>Employee Task Overview</h3>
 
@@ -398,6 +333,72 @@ const Analytics = () => {
             </div>
           ) : (
             <p>Loading project ratings...</p>
+          )}
+        </div>
+        {/* Task Timeline Chart Card */}
+        <div className="task-timeline-card">
+          {/* Project Filter Section */}
+          <div className="project-filter-container">
+            <h3>Detailed Project Overview</h3>
+            <select
+              className="projectOverviewSelect"
+              onChange={(e) => setSelectedProject(e.target.value)}
+              value={selectedProject}
+            >
+              <option value="">-- Select Project --</option>
+              {projects.map((project) => (
+                <option key={project.ProjectID} value={project.ProjectID}>
+                  {project.ProjectTitle} (ID: {project.ProjectID})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Grid Layout for Project Info and Timeline */}
+          {projectDetails && (
+            <div className="project-overview">
+              {/* Left: Project Details */}
+              <div className="project-details">
+                <h2>Project Details</h2>
+                <p>
+                  <strong>Project Title:</strong> {projectDetails.ProjectTitle}
+                </p>
+                <p>
+                  <strong>Team Leader:</strong> {projectDetails.TeamLeader}
+                </p>
+                <p>
+                  <strong>Team Members:</strong>{" "}
+                  {projectDetails.TeamMembers.join(", ")}
+                </p>
+                <p>
+                  <strong>Task Completion:</strong>{" "}
+                  {projectDetails.CompletedTasks} / {projectDetails.TotalTasks}
+                </p>
+              </div>
+
+              {/* Right: Project Timeline */}
+              <div className="project-timeline">
+                <h2>Project Timeline</h2>
+                <div className="timeline">
+                  {projectDetails.Timeline.map((milestone, index) => (
+                    <div
+                      key={index}
+                      className={`timeline-item ${milestone.status
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")}`}
+                    >
+                      <h4>{milestone.milestone}</h4>
+                      <p>
+                        {milestone.start_date} - {milestone.end_date}
+                      </p>
+                      <p>
+                        <strong>Status:</strong> {milestone.status}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </main>
