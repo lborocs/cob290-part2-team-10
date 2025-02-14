@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Avatar from "react-avatar"; // Import Avatar for the profile icon
-import { FaHome, FaTasks, FaComments, FaChartLine } from "react-icons/fa";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { Bar, Pie } from "react-chartjs-2"; // Correctly import both Bar and Pie
@@ -35,152 +34,137 @@ const Analytics = () => {
     setIsSidebarCollapsed((prevState) => !prevState);
   };
 
-  // Dummy tasks for Backlog
-  const b_tasks = [
-    "Complete project documentation",
-    "Project NADE",
-    "Code review for new features",
-    "Marketing Plan",
-    "Update project management tools",
-  ];
+  //Database connection
+  // const [topMostTasks, setTopMostTasks] = useState([]);
+  // const [topLeastTasks, setTopLeastTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [taskData, setTaskData] = useState([]);
+  const [expandedEmployee, setExpandedEmployee] = useState(null);
+  const [rowsToShow, setRowsToShow] = useState(10); // Default to 10 rows
+  const [overdueTasks, setOverdueTasks] = useState([]);
+  const [lowestRatedProject, setLowestRatedProject] = useState(null);
+  const [projects, setProjects] = useState([]); // Store all projects
+  const [selectedProject, setSelectedProject] = useState(""); // Selected Project ID
+  const [projectDetails, setProjectDetails] = useState(null);
+  const [projectTasks, setProjectTasks] = useState([]);
 
-  // Dummy data for task performance report
-  const performanceData = [
-    { employeeName: "Alice", completedTasks: 4, totalTasks: 5 },
-    { employeeName: "Dave", completedTasks: 3, totalTasks: 4 },
-    { employeeName: "Charlie", completedTasks: 5, totalTasks: 5 },
-    { employeeName: "Eve", completedTasks: 3, totalTasks: 6 },
-    { employeeName: "Bob", completedTasks: 1, totalTasks: 3 },
-  ];
-  const getLowestPerformer = () => {
-    // Calculate efficiency based on completedTasks / totalTasks and find the lowest
-    let lowestPerformer = performanceData.reduce((prev, current) => {
-      const prevEfficiency = prev.completedTasks / prev.totalTasks;
-      const currentEfficiency = current.completedTasks / current.totalTasks;
-      return prevEfficiency < currentEfficiency ? prev : current;
-    });
+  //Use effect for the backlog function
+  useEffect(() => {
+    fetch(`http://localhost:8000/get_analytics.php`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (!Array.isArray(data.tasks)) {
+          throw new Error("Invalid data structure received from API");
+        }
 
-    return lowestPerformer;
-  };
+        // Extract Overdue Tasks and Include Employee Name
+        const overdue = data.tasks.flatMap((employee) =>
+          employee.Tasks.filter(
+            (task) => new Date(task.DueDate) < new Date()
+          ).map((task) => ({
+            ...task, // Keep Task Data
+            EmployeeName: employee.Name, // Attach Employee Name
+          }))
+        );
 
-  const [isReportVisible, setIsReportVisible] = useState(false);
+        setOverdueTasks(overdue);
+        setTaskData(data.tasks);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+        setError(error);
+        setLoading(false);
+      });
+  }, []);
 
-  // Function to toggle report visibility
-  const toggleReportVisibility = () => {
-    setIsReportVisible((prevState) => !prevState);
-  };
+  // Fetch all project names & IDs
+  useEffect(() => {
+    fetch(`http://localhost:8000/allProjects.php`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.projects) {
+          setProjects(data.projects);
+        }
+      })
+      .catch((error) => console.error("Fetch error:", error));
+  }, []);
 
-  // Dummy data for users
-  const dummyUsers = [
-    { id: 1, name: "Alice", status: "Pending" },
-    { id: 2, name: "Bob", status: "Active" },
-    { id: 3, name: "Charlie", status: "Suspended" },
-    { id: 4, name: "David", status: "Active" },
-    { id: 5, name: "Eve", status: "Pending" },
-  ];
+  // Fetch project details when a project is selected
+  useEffect(() => {
+    if (selectedProject) {
+      // Only fetch if a project is selected
+      console.log(`Fetching project details for ID: ${selectedProject}`);
 
-  // State to manage the expansion of the "Manage Users" section and user data
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [users, setUsers] = useState(dummyUsers);
+      fetch(
+        `http://localhost:8000/allTasks.php?project_id=${encodeURIComponent(
+          selectedProject
+        )}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("API Response:", data); // Debug response
+          if (data.project_details) {
+            setProjectDetails(data.project_details);
+          } else {
+            console.error("No project details found.");
+            setProjectDetails(null); // Clear details if not found
+          }
+        })
+        .catch((error) => console.error("Fetch error:", error));
+    } else {
+      setProjectDetails(null); // Clear details if no project is selected
+    }
+  }, [selectedProject]);
 
-  // Toggle function to expand/collapse the "Manage Users" section
-  const toggleExpanded = () => {
-    setIsExpanded((prev) => !prev);
-  };
+  //Use effect for rating analysis
+  useEffect(() => {
+    fetch(`http://localhost:8000/ratings.php`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.lowest_rated_project) {
+          setLowestRatedProject(data.lowest_rated_project);
+        }
+      })
+      .catch((error) => console.error("Fetch error:", error));
+  }, []);
 
-  // Function to change user status
-  const updateUserStatus = (id, status) => {
-    const updatedUsers = users.map((user) =>
-      user.id === id ? { ...user, status } : user
-    );
-    setUsers(updatedUsers);
-  };
+  //Use effect for the Employee Task overview
+  useEffect(() => {
+    fetch(`http://localhost:8000/get_analytics.php`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (!Array.isArray(data.tasks)) {
+          throw new Error("Invalid data structure received from API");
+        }
+        setTaskData(data.tasks);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+        setError(error);
+        setLoading(false);
+      });
+  }, []);
 
-  // Function to delete a user
-  const deleteUser = (id) => {
-    const updatedUsers = users.filter((user) => user.id !== id);
-    setUsers(updatedUsers);
-  };
-
-  // Dummy data for task timeline chart
-  const taskTimelineData = {
-    labels: [
-      "Code Review",
-      "Marketing Plan",
-      "Boots Delivery System",
-      "AI Chatbot Integration",
-      "Noir App",
-    ], // Project names
-    datasets: [
-      {
-        label: "Deadline (Days Left)",
-        data: [10, 15, 5, 7, 11], // Deadlines for each project
-        backgroundColor: "#BEC7E7", // Purple color for Deadline bars,
-      },
-      {
-        label: "Assumed Completion (Days)",
-        data: [8, 13, 6, 5, 4], // Assumed completion for each project
-        backgroundColor: "rgba(75, 192, 192, 0.6)", // Blue color
-      },
-    ],
-  };
-
-  const [tasks, setTasks] = useState([
-    { taskName: "Team meeting preparation", employeeName: "David" },
-    { taskName: "Fix bugs in Noir App", employeeName: "Charlie" },
-    { taskName: "Code review", employeeName: "Eve" },
-    { taskName: "Budgeting for AI chatbot", employeeName: "Nelson" },
-    { taskName: "Client Meeting with Boots", employeeName: "Alice" },
-    { taskName: "Complete project documentation", employeeName: "Bob" },
-  ]);
-
-  const [taskName, setTaskName] = useState("");
-  const [employeeName, setEmployeeName] = useState("");
-
-  // Data for pie chart
-  const pieChartData = {
-    labels: tasks.map((task) => task.employeeName),
-    datasets: [
-      {
-        data: tasks.map(() => 1), // Equal task distribution
-        backgroundColor: [
-          "#BEC7E7",
-          "#d3d2c7",
-          "#fff4bd",
-          "rgba(75, 192, 192, 0.6)",
-          "#F7C9B6",
-          "#b1d8b7",
-          "#e6b794",
-          "#d3b5e5",
-          "#8cbcb6",
-        ],
-      },
-    ],
-  };
-
-  // Pie chart options to show task name on hover
-  const pieChartOptions = {
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: function (context) {
-            // Show the task name instead of the count
-            const task = tasks[context.dataIndex]; // Get the task from the dataIndex
-            return `${task.taskName} (Assigned to: ${task.employeeName})`;
-          },
-        },
-      },
-    },
-    responsive: true,
-  };
-
-  // Function to add a new task
-  const addTask = (e) => {
-    e.preventDefault();
-    setTasks([...tasks, { taskName, employeeName }]);
-    setTaskName("");
-    setEmployeeName("");
-  };
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div className="analytics-container">
@@ -198,171 +182,225 @@ const Analytics = () => {
           />
         </div>
       </div>
-      {/* Blank Main Content for Customization */}
       <main className="analytics-content">
         {/* Backlog Card */}
         <div className="backlog-card">
-          <h2 className="backlog-title">Backlog</h2>
+          <h2 className="backlog-title">
+            Backlog{" "}
+            <span style={{ fontSize: "16px", color: "#757575" }}>
+              ({overdueTasks.length})
+            </span>
+          </h2>
           <ul className="backlog-task-list">
-            {b_tasks.map((task, index) => (
-              <li key={index} className="backlog-task-item">
-                {task}
-              </li>
-            ))}
+            {overdueTasks.length > 0 ? (
+              overdueTasks.map((task, index) => (
+                <li key={index} className="backlog-task-item">
+                  <strong>{task.Description}</strong> - Assigned to:{" "}
+                  {task.EmployeeName} (Due: {task.DueDate})
+                </li>
+              ))
+            ) : (
+              <p>No overdue tasks!</p>
+            )}
           </ul>
         </div>
 
-        {/* Task Timeline Chart Card */}
-        <div className="task-timeline-card">
-          <h2 className="timeline-title">Task Timeline</h2>
-          <div className="line-chart-container">
-            <Bar
-              data={taskTimelineData}
-              options={{
-                responsive: true,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    title: {
-                      display: true,
-                      text: "Days Left",
-                    },
-                  },
-                },
-              }}
-            />
-          </div>
-        </div>
+        <div className="emp-analysis-charts-card">
+          <h3>Employee Task Overview</h3>
 
-        {/* Task Distribution Pie Chart Card */}
-        <div className="task-pie-chart-card">
-          <h2 className="timeline-title">Task Distribution</h2>
-          <div className="pie-chart-container">
-            <Pie data={pieChartData} options={pieChartOptions} />
+          {/* Filter for Number of Rows */}
+          <div className="filter-container">
+            <label>Show: </label>
+            <select
+              value={rowsToShow}
+              onChange={(e) => setRowsToShow(Number(e.target.value))}
+            >
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value={taskData.length}>All</option>{" "}
+              {/* Dynamically show all */}
+            </select>
           </div>
 
-          {/* Add Task Form */}
-          <div className="add-task-form">
-            <h3>Add New Task</h3>
-            <form onSubmit={addTask}>
-              <input
-                type="text"
-                placeholder="Task Name"
-                value={taskName}
-                onChange={(e) => setTaskName(e.target.value)}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Employee Name"
-                value={employeeName}
-                onChange={(e) => setEmployeeName(e.target.value)}
-                required
-              />
-              <button type="submit" className="manager-add-task-button">
-                Add Task
-              </button>
-            </form>
-          </div>
+          {/* Employee Task Table */}
+          <table className="task-table">
+            <thead>
+              <tr>
+                <th>Employee Name</th>
+                <th>Total Tasks</th>
+                <th>Pending</th>
+                <th>Completed</th>
+              </tr>
+            </thead>
+            <tbody>
+              {taskData.slice(0, rowsToShow).map((employee, index) => (
+                <React.Fragment key={index}>
+                  <tr
+                    className="clickable-row"
+                    onClick={() =>
+                      setExpandedEmployee(
+                        expandedEmployee === employee.Name
+                          ? null
+                          : employee.Name
+                      )
+                    }
+                  >
+                    <td>{employee.Name}</td>
+                    <td>{employee.TotalTasks}</td>
+                    <td>{employee.Pending}</td>
+                    <td>{employee.Completed}</td>
+                  </tr>
+
+                  {/* Show Task Details When Employee is Expanded */}
+                  {expandedEmployee === employee.Name && (
+                    <tr className="task-details-row">
+                      <td colSpan="5">
+                        <table className="task-details-table">
+                          <thead>
+                            <tr>
+                              <th>Task ID</th>
+                              <th>Description</th>
+                              <th>Status</th>
+                              <th>Due Date</th>
+                              <th>Category</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {employee.Tasks.map((task, taskIndex) => (
+                              <tr key={taskIndex}>
+                                <td>{task.TaskID}</td>
+                                <td>{task.Description}</td>
+                                <td>{task.Status}</td>
+                                <td>{task.DueDate}</td>
+                                <td>{task.Category}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <button
+                          className="close-details-btn"
+                          onClick={() => setExpandedEmployee(null)}
+                        >
+                          Close
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
         </div>
+
         {/* Task Performance Report Card */}
         <div className="task-performance-report-card">
-          <h3>Task Completion Efficiency</h3>
-          <ul>
-            {performanceData.map((member, index) => (
-              <li key={index}>
-                <Avatar
-                  name={member.employeeName}
-                  round
-                  size="30"
-                  color={
-                    ["#e57373", "#81c784", "#64b5f6", "#ffb74d", "#ba68c8"][
-                      index % 5
-                    ]
-                  } // Different colors for each avatar
-                  textColor="#fff"
-                />
-                {` ${member.employeeName}: ${member.completedTasks}/${member.totalTasks} tasks completed`}
-              </li>
-            ))}
-          </ul>
+          <h3>Project In Training</h3>
 
-          {/* Display the lowest performer */}
-          <div className="training-suggestion">
-            {(() => {
-              const lowestPerformer = getLowestPerformer();
-              return (
-                <p>
-                  RECOMMENDATION: Employee{" "}
-                  <strong>{lowestPerformer.employeeName}</strong> needs
-                  training.
-                </p>
-              );
-            })()}
-          </div>
-        </div>
+          {lowestRatedProject ? (
+            <div className="lowest-rated-project">
+              <p>
+                <strong>Lowest Rated Project</strong>:{" "}
+                {lowestRatedProject.ProjectTitle}
+                <br />
+                <strong>Project Leader</strong>:{" "}
+                {lowestRatedProject.TeamLeaderName}
+                <br />
+                <strong>Average Project Rating</strong>:{" "}
+                <span style={{ color: "red" }}>
+                  {lowestRatedProject.AvgRating.toFixed(2)}
+                </span>
+              </p>
 
-        {/* <div className="manage-users-section">
-          <button className="expand-btn" onClick={toggleExpanded}>
-            {isExpanded ? "-" : "+"} Manage Users
-          </button>
-
-          {isExpanded && (
-            <div className="manage-users-content">
-              <h3>User Accounts</h3>
-              <table className="user-table">
+              <h3>Tasks In Training</h3>
+              <table className="training-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>Task Name</th>
+                    <th>Rating</th>
+                    <th>Assigned Employee</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id}>
-                      <td>{user.id}</td>
-                      <td>{user.name}</td>
-                      <td>{user.status}</td>
-                      <td>
-                        {user.status === "Pending" && (
-                          <button
-                            onClick={() => updateUserStatus(user.id, "Active")}
-                          >
-                            Approve
-                          </button>
-                        )}
-                        {user.status === "Active" && (
-                          <button
-                            onClick={() =>
-                              updateUserStatus(user.id, "Suspended")
-                            }
-                          >
-                            Suspend
-                          </button>
-                        )}
-                        {user.status === "Suspended" && (
-                          <button
-                            onClick={() => updateUserStatus(user.id, "Active")}
-                          >
-                            Reactivate
-                          </button>
-                        )}
-                        <button
-                          className="delete-btn"
-                          onClick={() => deleteUser(user.id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
+                  {lowestRatedProject.LowestRatedTasks.map((task, index) => (
+                    <tr key={index}>
+                      <td>{task.TaskName}</td>
+                      <td style={{ color: "red" }}>{task.Rating}</td>
+                      <td>{task.EmployeeName}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+          ) : (
+            <p>Loading project ratings...</p>
           )}
-        </div> */}
+        </div>
+        {/* Task Timeline Chart Card */}
+        <div className="task-timeline-card">
+          {/* Project Filter Section */}
+          <div className="project-filter-container">
+            <h3>Detailed Project Overview</h3>
+            <select
+              className="projectOverviewSelect"
+              onChange={(e) => setSelectedProject(e.target.value)}
+              value={selectedProject}
+            >
+              <option value="">-- Select Project --</option>
+              {projects.map((project) => (
+                <option key={project.ProjectID} value={project.ProjectID}>
+                  {project.ProjectTitle} (ID: {project.ProjectID})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Grid Layout for Project Info and Timeline */}
+          {projectDetails && (
+            <div className="project-overview">
+              {/* Left: Project Details */}
+              <div className="project-details">
+                <h2>Project Details</h2>
+                <p>
+                  <strong>Project Title:</strong> {projectDetails.ProjectTitle}
+                </p>
+                <p>
+                  <strong>Team Leader:</strong> {projectDetails.TeamLeader}
+                </p>
+                <p>
+                  <strong>Team Members:</strong>{" "}
+                  {projectDetails.TeamMembers.join(", ")}
+                </p>
+                <p>
+                  <strong>Task Completion:</strong>{" "}
+                  {projectDetails.CompletedTasks} / {projectDetails.TotalTasks}
+                </p>
+              </div>
+
+              {/* Right: Project Timeline */}
+              <div className="project-timeline">
+                <h2>Project Timeline</h2>
+                <div className="timeline">
+                  {projectDetails.Timeline.map((milestone, index) => (
+                    <div
+                      key={index}
+                      className={`timeline-item ${milestone.status
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")}`}
+                    >
+                      <h4>{milestone.milestone}</h4>
+                      <p>
+                        {milestone.start_date} - {milestone.end_date}
+                      </p>
+                      <p>
+                        <strong>Status:</strong> {milestone.status}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
