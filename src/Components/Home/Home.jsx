@@ -35,6 +35,23 @@ const collaboratorColors = {
 
 
 const Home = () => {
+
+
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+if (user) {
+  console.log("User ID:", user.id);
+  console.log("User Role:", user.name);
+} else {
+  console.log("No user found in localStorage.");
+}
+const employeename=user.name;
+
+///####///
+
+
+  
   //
   const [post1data, newData] = useState(null);
   let url="http://localhost:8000/testtopics.php"
@@ -127,6 +144,8 @@ for (  i=0;i<listdata.length;i++){
 };//#for loop
 }catch(exception){}
 
+
+  
 const [isFormOpen, setIsFormOpen] = useState(false);
 const [newTask, setNewTask] = useState({
   title: "",
