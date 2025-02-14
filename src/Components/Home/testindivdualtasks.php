@@ -17,8 +17,10 @@ if (!$conn) {
   die("Connection failed: " . mysqli_connect_error()); } 
 $empID;
 $qy="Select * from `Tasks` where `EmployeeId`=".$empID;
-$res=mysqli_query();
-$row=mysqli_fetch_array();
+$res=mysqli_query($qy);
+while($row=mysqli_fetch_array($res)) {
+  
+} 
 #group/filter by status where if comlpleted/not. results needed for bar chart
   mysqli_close($conn);
 ?>
