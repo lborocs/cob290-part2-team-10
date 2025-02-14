@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import "./Projects.css"; // Keep the same CSS
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -5,6 +6,7 @@ import { faBell } from "@fortawesome/free-solid-svg-icons";
 import Avatar from "react-avatar";
 import Sidebar from "../Sidebar/Sidebar.jsx"; // Import Sidebar component
 import { useNavigate } from 'react-router-dom'; // Correctly import useNavigate
+//const [userRole, setUserRole] = useState(""); // Store the user role
 
 const Projects = () => {
   const navigate = useNavigate();  // useNavigate hook inside the component
@@ -19,9 +21,17 @@ const Projects = () => {
     teamLeader: "",
     teamMembers: [],
     tasks: [],
-    milestones: []
+    milestones: [] 
   });
+  const user = JSON.parse(localStorage.getItem("user"));
 
+if (user) {
+  console.log("User ID:", user.id);
+  console.log("User n:", user.name);
+} else {
+  console.log("No user found in localStorage.");
+}
+ 
   // Handle Add Project click
   const handleAddProjectClick = () => {
     navigate('/add-project');  // Navigate to Add Project page
@@ -29,22 +39,25 @@ const Projects = () => {
 
   // Fetch projects and employees
   useEffect(() => {
-    fetch("http://localhost:8000/get_projects.php")
+    const user = JSON.parse(localStorage.getItem("user"));
+  
+    if (!user || !user.id) {
+      console.error("No user found in localStorage.");
+      return;
+    }
+  
+    fetch(`http://localhost:8000/get_projects.php?UserID=${user.id}`)
       .then((response) => response.json())
       .then((data) => {
-        setProjects(data.projects);
-        setActiveProject(data.projects.length > 0 ? data.projects[0] : null);
+        if (data.projects) {
+          setProjects(data.projects);
+          setActiveProject(data.projects.length > 0 ? data.projects[0] : null);
+        } else {
+          console.error("Error fetching projects:", data.error);
+        }
         setLoading(false);
       })
       .catch((error) => console.error("Error fetching projects:", error));
-
-    // Fetch employees for the dropdown
-    fetch("http://localhost:8000/get_employees.php")
-      .then((response) => response.json())
-      .then((data) => {
-        setEmployees(data.employees);
-      })
-      .catch((error) => console.error("Error fetching employees:", error));
   }, []);
 
   // Handle selecting a project
@@ -140,8 +153,11 @@ const Projects = () => {
               {project.title}
             </button>
           ))}
-          <button onClick={handleAddProjectClick}>+ Add Project</button>
-  
+          <div>
+    {user?.role === "manager" && (
+      <button onClick={handleAddProjectClick}>+ Add Project</button>
+    )}
+  </div>
         </div>
 
         <div className="project-info-content">

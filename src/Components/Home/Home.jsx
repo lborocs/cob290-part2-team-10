@@ -13,15 +13,25 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./Home.css";
 import { TitleTwoTone } from "@mui/icons-material";
-
+const [projectdata, newData2] = useState(null);
+  let url="http://localhost:8000/testindividualtasks.php"
+  useEffect(() => {
+      fetch(url )
+    .then((response) => response.json())
+    .then(newData2)
+  //  .then(json => {   console.log('parsed json', json)}
+    .catch(error => console.error('Error fetching data:', error));
+},[]);
+//projectdata should hold: [project1,com,unc],[project2,com,unc]
 const projects = [
-  { name: "Shop Inventory", totalTasks: 20, completedTasks: 15 },
-  { name: "Delivery App", totalTasks: 25, completedTasks: 20 },
-  { name: "Requirements Documentation", totalTasks: 18, completedTasks: 10 },
-  { name: "Backend API", totalTasks: 22, completedTasks: 12 },
-  { name: "UI Design", totalTasks: 15, completedTasks: 12 },
-];
 
+  { }
+];
+for(var i=0;i<projectdata.length;i++){
+  projects.push(
+    {name: projectdata[i].title, totalTasks:projectdata[i].taskc+ projectdata[i].taskn, completedTasks: projectdata[i].taskc},
+  )
+}
 const averageCompletionRate =
   (projects.reduce((sum, project) => sum + project.completedTasks, 0) /
     projects.reduce((sum, project) => sum + project.totalTasks, 0)) *

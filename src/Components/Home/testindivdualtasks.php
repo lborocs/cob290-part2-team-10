@@ -15,12 +15,34 @@ $Databasename="team010";
 $conn = mysqli_connect($Servername, $Username, $Password, $Databasename);
 if (!$conn) { 
   die("Connection failed: " . mysqli_connect_error()); } 
-$empID;
-$qy="Select * from `Tasks` where `EmployeeId`=".$empID;
+$empID=$_GET[empID] ;
+$qy="Select TaskID,ProjectID,,title,Tasks.Description,Status,EmployeeID from `Tasks` LEFT join Projects on ProjectID where `EmployeeId`=".$empID." group by ProjectID";
 $res=mysqli_query($qy);
+$tryjsoning=array("complete"=>0,"not"=>0);
+$i=mysqli_num_rows($res);
+$indvprojects=array();
+for($x=0;$x<$i;$x++){
+
 while($row=mysqli_fetch_array($res)) {
   
-} 
+  if ($row[5]==$empID){
+    if($row[4]=="completed"){
+      $tryjsoning["complete"]+=1;
+    }
+    else{
+      $tryjsoning["not"]+=1;}
+      $indvprojects[$row[2]]=array("title"=>$row[2],"tasksc"=>$tryjsoning["complete"],"tasksn"=>$tryjsoning["not"]);
+    #row3 is desc
+    #row2 is project title
+  }
+} }#check if list is iteratable on numbers as well
 #group/filter by status where if comlpleted/not. results needed for bar chart
   mysqli_close($conn);
+$i=0;
+foreach($tryjsoning as $x=>$y){
+  $l[$i]=$y;
+  $i++;
+}
+$q=json_encode($l);
+echo $q;  
 ?>
