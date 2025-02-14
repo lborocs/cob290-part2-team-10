@@ -26,7 +26,7 @@ enum Taskstatus: string {
 }
 #$role = taskstatus::todo->value;
 
-$empID=json_decode(file_get_contents("php://input"));
+$empID=$_GET[empID] ;#json_decode(file_get_contents("php://input"));
 #$empID=2;
 $query= "Select * from `To-Do-List` where `employeeID`=".$empID ; 
 
