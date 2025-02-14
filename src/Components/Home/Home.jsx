@@ -13,6 +13,9 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./Home.css";
 import { TitleTwoTone } from "@mui/icons-material";
+import Typography from '@mui/material/Typography';
+
+
 const [projectdata, newData2] = useState(null);
   let url="http://localhost:8000/testindividualtasks.php"
   useEffect(() => {
@@ -274,6 +277,7 @@ const deleteTask = (taskTitle, column) => {
               <div className="overview-charts">
                 {/* Pie Chart for Average Completion Rate */}
                 <div className="average-completion-pie">
+         <Typography>Your Efficiency</Typography>
                   <PieChart
                     series={[
                       {
@@ -319,6 +323,9 @@ const deleteTask = (taskTitle, column) => {
                 {/* Bar Chart for Project-Specific Task Counts */}
                 <div className="projects-bar-chart">
                   <BarChart
+                   xAxis={[{ 
+                    scaleType: 'band', data: projects.map((project)=>project.name)
+                   }]}
                     series={[
                       {
                         data: projects.map((project) => project.totalTasks),
