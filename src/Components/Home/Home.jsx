@@ -37,16 +37,18 @@ const collaboratorColors = {
 const Home = () => {
   //
   const [post1data, newData] = useState(null);
-  let url="http://localhost:3000/testtopics.php"
+  let url="http://localhost:8000/testtopics.php"
   useEffect(() => {
-      fetch(url,{headers:{accept:"application/json" }} )
+      fetch(url )
     .then((response) => response.json())
     .then(newData)
+  //  .then(json => {   console.log('parsed json', json)}
     .catch(error => console.error('Error fetching data:', error));
 },[]);
 const [listdata, newData1] = useState(null);
-let url2="http://localhost:3001/testlist.php.php"
+let url2="http://localhost:8000/testlist.php.php"
 useEffect(() => {
+  //need to acutually send the logged in user's id...how?? id love it if another page when _Logging_ in could send a cookie or soemthing
     fetch(url2,{headers:{accept:"application/json" }} )
   .then((response) => response.json())
   .then(newData1)
@@ -56,10 +58,12 @@ useEffect(() => {
   const [date, setDate] = useState(new Date());
 console.log("pizza");
   console.log(post1data);
+  console.log(newData);
 console.log("a");
   //######
 const projectData = [{  }];
 var n=0;
+try{
 while (post1data.length>0 &&n<3){
 
   projectData.push(
@@ -73,7 +77,8 @@ id: post1data[n]['id'],
   ); 
   n++;
   
-};
+};}
+catch(exception){}
   //tasks
  //listdata is the list data to be iterated over
 // Hardcoded initial tasks
@@ -86,6 +91,7 @@ const [tasks, setTasks1] = useState({
 
 });
 var i=0;
+try{
 for (  i=0;i<listdata.length;i++){
   if(listdata[i]['currentProgress']=="todo"){
     [tasks,setTasks1].todo.push(
@@ -119,7 +125,7 @@ for (  i=0;i<listdata.length;i++){
 
 };
 };//#for loop
-
+}catch(exception){}
 
 const [isFormOpen, setIsFormOpen] = useState(false);
 const [newTask, setNewTask] = useState({
@@ -215,12 +221,12 @@ const deleteTask = (taskTitle, column) => {
       <main className="main-content">
         {/* Header */}
         <div className="top-bar">
-          <span className="header-text">Good Morning, Alice 👋</span>
+          <span className="header-text">Good Morning, {"employeename"} 👋</span>
           <div className="main-user-info">
             <FontAwesomeIcon icon={faBell} className="bell-icon" />
             <div className="user-avatar">
               <Avatar
-                name="Alice"
+                name={"employeename"}
                 round={true}
                 size="50"
                 color="#0a6476"
@@ -467,7 +473,7 @@ const deleteTask = (taskTitle, column) => {
                     <h2>{item.title}</h2>
                     <p>{item.content}</p>
                     <span
-                      className={`category-label ${item.category.toLowerCase()}`}
+                      className={`category-label ${item.category}`}
                     >
                       {item.category}
                     </span>
