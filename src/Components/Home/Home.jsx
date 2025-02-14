@@ -63,7 +63,7 @@ const employeename=user.name;
     .catch(error => console.error('Error fetching data:', error));
 },[]);
 const [listdata, newData1] = useState(null);
-let url2="http://localhost:8000/testlist.php.php?"+user.id;
+let url2="http://localhost:8000/testlist.php.php?empID="+user.id;
 useEffect(() => {
   //need to acutually send the logged in user's id...how?? id love it if another page when _Logging_ in could send a cookie or soemthing
     fetch(url2,{headers:{accept:"application/json" }} )
