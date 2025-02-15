@@ -3,7 +3,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json");
-// Initialize response array
+// Initialise response array
 $response = array();
 
 // Connect to the database
@@ -65,11 +65,6 @@ if (!$user) {
     echo json_encode(["status" => "error", "error" => "User not found in the database"]);
     exit();
 }
-
-// if ($userExists <= 0) {
-//     echo json_encode(["status" => "error", "error" => "User does not exist"]);
-//     exit();
-// }
 
 // Hash the new password securely
 $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
