@@ -26,7 +26,8 @@ $conn = mysqli_connect($Servername, $Username, $Password, $Databasename);
 if (!$conn) { 
   die("Connection failed: " . mysqli_connect_error()); } 
 $taskjson=json_encode($_POST['tasks']);
-for ($i=0;$i<$taskjson.length ; $i++){
+$a=json_decode($taskjson);
+for ($i=0;$i<count($a) ; $i++){
 $q="Insert into To-Do-List (`employeeID`,`title`,`description`,`currentProgress`,`deadline`) values(".$taskjson[$i].id.",".$taskjson[$i].title.",".$taskjson[$i].description.",".$taskjson[$i].prog.",".$taskjson[$i].deadline.")";
 $result = mysqli_query($conn,$q);
 $row = mysqli_fetch_array($result);
