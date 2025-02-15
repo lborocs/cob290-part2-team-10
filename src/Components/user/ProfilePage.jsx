@@ -1,10 +1,10 @@
-// ProfilePage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar/Sidebar.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { faUserCircle } from "@fortawesome/free-solid-svg-icons"; 
 import Avatar from "react-avatar";
-import userProfileImg from "./userprofileimg.png";
 import "./ProfilePage.css";
 
 const ProfilePage = ({ isAdmin }) => {
@@ -12,174 +12,233 @@ const ProfilePage = ({ isAdmin }) => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [email, setEmail] = useState("alicesmith@example.com");
-  const [preferredName, setPreferredName] = useState("Alice Smith");
-  const [position, setPosition] = useState("Manager");
   const [isEditing, setIsEditing] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const toggleExpanded = () => setIsExpanded(!isExpanded);
+  const [profileData, setProfileData] = useState({email:"",preferredName:"", position:""});
+  const [userEmail, setUserEmail] = useState("");
+  const [storedPreferredName, setstoredPreferredName] = useState("");
+  const [userId, setUserId] = useState(null);  // Initialise state with null or an empty value
+  const [loading, setLoading] = useState(false); // Added loading state
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
+  console.log("User ID from state:", userId); // ensure the id structure is correct
+  console.log("User ID:", user?.id);
+ 
 
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "Alice",
-      email: "employee1@example.com",
-      status: "Active",
-      recentActivity: "Completed task on Project A",
-    },
-    {
-      id: 2,
-      name: "Bob",
-      email: "employee2@example.com",
-      status: "No Recent Activity",
-      recentActivity: "No recent activity",
-    },
-    {
-      id: 3,
-      name: "Martin",
-      email: "employee2@example.com",
-      status: "Active",
-      recentActivity: "No recent activity",
-    },
-    {
-      id: 2,
-      name: "Steven",
-      email: "employee2@example.com",
-      status: "No Recent Activity",
-      recentActivity: "No recent activity",
-    },
-  ]);
-  // State variables...
 
-  // Handlers for user management
-  const updateUserStatus = (id, status) => {
-    const updatedUsers = users.map((user) =>
-      user.id === id ? { ...user, status } : user
-    );
-    setUsers(updatedUsers);
-  };
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      if (parsedUser.id) {
+        setUserId(parsedUser.id); // Set the user ID
+        console.log("User ID from localStorage:", parsedUser.id);
+      } else {
+        console.warn("User ID field missing in localStorage user object.");
+      }
+    } else {
+      console.warn("No user found in localStorage.");
+    }
+  }, []);
+  
+  
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!userId) return; // Ensure email is set before fetching
+  
+      try {
+        console.log("Fetching profile data for UserID:", userId);
+        const response = await fetch(
+          `http://localhost:8000/src/Components/user/ProfileData.php?UserID=${user.id}`
+        );
+        if (!userId) {
+          console.error("User ID missing");
+          return;
+        }
+  
+        if (!response.ok) {
+          throw new Error("Failed to fetch profile");
+        }
+  
+        const data = await response.json();
+        console.log('Fetched profile data1:', data.status); //debugging
+        console.log('Fetched profile data2:', data.user); //debugging
+        // Check if the response status is 'success' before setting the profile data
+        if (data.status === 'success') {
+          console.log('Fetched profile dataaaaaa:');
+          setProfileData({
+            preferredName: data.user.preferredName, // Use stored name if available
+            email: data.user.email,
+            position: data.user.position,
+          });
+        } else {
+          console.error("Failed to fetch valid user data");
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+  
+    fetchProfile();
+  }, [userId]); // Re-fetch when userId is set
+  
+  
 
-  const deleteUser = (id) => {
-    const updatedUsers = users.filter((user) => user.id !== id);
-    setUsers(updatedUsers);
-  };
-
-  const [notification, setNotification] = useState(null);
-
-  const handleSaveProfile = () => setIsEditing(false);
-  const [profileImage, setProfileImage] = useState(userProfileImg);
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProfileImage(URL.createObjectURL(file));
+  
+  const handleSaveProfile = async () => {
+    try {
+      const dataToSend = {
+        UserID: user.id,
+        PreferredName: profileData?.preferredName,
+      };
+      const response = await fetch('http://localhost:8000/src/Components/user/UpdateProfile.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+  
+      const data = await response.json();
+  
+      if (data.status === 'success') {
+        setIsEditing(false); // Exit editing mode
+        console.log("Profile saved successfully");
+      } else {
+        console.error("Failed to save profile:", data.error || 'Unknown error');
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error);
     }
   };
 
-  const handlePasswordChange = () => {
-    const correctCurrentPassword = "password";
-    if (currentPassword !== correctCurrentPassword) {
-      alert("Current password is incorrect.");
+  const handlePasswordChange = async () => {
+    if (!newPassword || !confirmPassword) {
+      alert("Please fill in all fields.");
       return;
     }
+
     if (newPassword !== confirmPassword) {
-      alert("Passwords don't match");
+      alert("Passwords don't match.");
       return;
     }
-    alert("Password Changed");
-  };
 
-  const handleSuspend = (userId) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === userId ? { ...user, status: "suspended" } : user
-      )
-    );
-    setNotification("User suspended");
-    setTimeout(() => setNotification(null), 2000);
-  };
+    if (newPassword.length < 8) {
+      alert("Password must be at least 8 characters long.");
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword) || 
+        !/[a-z]/.test(newPassword) || 
+        !/[0-9]/.test(newPassword) || 
+        !/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+      alert("Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+      return;
+        }
 
-  const handleDelete = (userId) => {
-    setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
-    setNotification("User deleted");
-    setTimeout(() => setNotification(null), 2000);
-  };
+    if (!userId) {
+      alert("UserID not found. Please refresh the page.");
+      return;
+    }
 
+    // Log the UserID to check its value
+    console.log("User ID handlePasswordChange:", userId);
+
+    setLoading(true);
+
+    try {
+      const payload = {
+        UserID: userId,
+        newPassword: newPassword
+    };
+    // This will log the properly formatted JSON string
+      console.log("Payload being sent:", JSON.stringify(payload));
+
+     console.log("Payload being sent:", payload);
+      const response = await fetch("http://localhost:8000/src/Components/user/ChangePassword.php", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json;',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      console.log({
+        UserID: userId,
+        newPassword: newPassword
+      });
+      console.log("Server Response:", data);
+
+      if (data.status === "success") {
+        alert("Password changed successfully!");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        alert(data.error || "Failed to change password.");
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+//if(){}
   return (
     <div className="profile-main">
-      {/* <Sidebar /> */}
       <div className="profile-page-container">
         <div className="user-info">
           <FontAwesomeIcon icon={faBell} className="bell-icon" />
-          <Avatar name="Alice" round={true} size="50" color="#0a6476" />
-          {/* <span className="user-name">Alice / Backend Developer</span> */}
+          <Avatar name={profileData.preferredName || "User"} round={true} size="50" color="#0a6476" />
         </div>
         <h1 className="profilepage-title">User Profile</h1>
         <div className="profile-grid-container">
-          {/* User Profile Section */}
           <div className="profile-user-profile">
             <div className="profile-user-image">
-              <img src={profileImage} alt="Profile" />
-              <label className="change-pic-label" htmlFor="imageUpload">
-                Change Photo
-              </label>
-              <input
-                id="imageUpload"
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                onChange={handleImageChange}
-              />
+      <FontAwesomeIcon icon={faUserCircle} size="5x" className="user-profile-icon" />
             </div>
             <div className="user-change-details">
               <div className="profile-user-details">
                 <h2>Personal Information</h2>
                 <div>
                   <label>Email: </label>
-                  {email}
+                  {profileData.email || "N/A"}
                 </div>
                 <div>
                   <label>Preferred Name: </label>
                   {isEditing ? (
                     <input
                       type="text"
-                      value={preferredName}
-                      onChange={(e) => setPreferredName(e.target.value)}
+                      value={profileData.preferredName || ""}
+                      onChange={(e) =>
+                        setProfileData((prev) => ({
+                          ...prev,
+                          preferredName: e.target.value, //update preferred name in state 
+                        }))
+                      }
                     />
                   ) : (
-                    <span>{preferredName}</span>
+                   <div>
+                    <span>{profileData.preferredName || "N/A"}</span>
+                   </div> 
                   )}
                 </div>
                 <div>
                   <label>Position: </label>
-                  {position}
+                  {profileData.position || "N/A"}
                 </div>
                 {isEditing ? (
-                  <button onClick={handleSaveProfile}>Save</button>
+                  <button onClick={handleSaveProfile}>Save</button> //save button to save the changes 
                 ) : (
-                  <button onClick={() => setIsEditing(true)}>
-                    Edit Profile
-                  </button>
+                  <button onClick={() => setIsEditing(true)}>Edit Profile</button> // Edit button to switch to the editting mode
                 )}
               </div>
 
-              {/* Password Management Section */}
               <div className="profile-password-management">
                 <h2>Password Management</h2>
-                <div>
-                  <label>Current Password: </label>
-                  <input
-                    type={showCurrentPassword ? "text" : "password"}
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                  />
-                  <i
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  ></i>
-                </div>
                 <div>
                   <label>New Password: </label>
                   <input
@@ -187,7 +246,7 @@ const ProfilePage = ({ isAdmin }) => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
-                  <i onClick={() => setShowNewPassword(!showNewPassword)}></i>
+                  <i onClick={() => setShowNewPassword(!showNewPassword)}>👁</i>
                 </div>
                 <div>
                   <label>Confirm New Password: </label>
@@ -196,82 +255,14 @@ const ProfilePage = ({ isAdmin }) => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
-                  <i
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  ></i>
-                </div>
-                <button onClick={handlePasswordChange}>Change Password</button>
+                  <i onClick={() => setShowConfirmPassword(!showConfirmPassword)}>👁</i>
+                  </div>
+                <button onClick={handlePasswordChange} disabled={loading}>
+        {loading ? "Changing..." : "Change Password"}
+      </button>
               </div>
             </div>
           </div>
-
-          {/* Admin Controls Section */}
-          {isAdmin && (
-            <div className="profile-admin-controls">
-              <h2>Manage Employee Accounts</h2>
-
-              {/* Moved Manage Users Section */}
-              <div className="manage-users-section">
-                <div className="manage-users-content">
-                  <h3>User Accounts</h3>
-                  <table className="user-table">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.map((user) => (
-                        <tr key={user.id}>
-                          <td>{user.id}</td>
-                          <td>{user.name}</td>
-                          <td>{user.status}</td>
-                          <td>
-                            {user.status === "Pending" && (
-                              <button
-                                onClick={() =>
-                                  updateUserStatus(user.id, "Active")
-                                }
-                              >
-                                Approve
-                              </button>
-                            )}
-                            {user.status === "Active" && (
-                              <button
-                                onClick={() =>
-                                  updateUserStatus(user.id, "Suspended")
-                                }
-                              >
-                                Suspend
-                              </button>
-                            )}
-                            {user.status === "Suspended" && (
-                              <button
-                                onClick={() =>
-                                  updateUserStatus(user.id, "Active")
-                                }
-                              >
-                                Reactivate
-                              </button>
-                            )}
-                            <button
-                              className="delete-btn"
-                              onClick={() => deleteUser(user.id)}
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
