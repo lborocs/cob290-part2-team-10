@@ -14,46 +14,18 @@ import "react-calendar/dist/Calendar.css";
 import "./Home.css";
 import { TitleTwoTone } from "@mui/icons-material";
 import Typography from '@mui/material/Typography';
-
-
-const [projectdata, newData2] = useState(null);
-  let url="http://localhost:8000/testindividualtasks.php"
-  useEffect(() => {
-      fetch(url )
-    .then((response) => response.json())
-    .then(newData2)
-  //  .then(json => {   console.log('parsed json', json)}
-    .catch(error => console.error('Error fetching data:', error));
-},[]);
-//projectdata should hold: [project1,com,unc],[project2,com,unc]
-const projects = [
-
-  { }
-];
-for(var i=0;i<projectdata.length;i++){
-  projects.push(
-    {name: projectdata[i].title, totalTasks:projectdata[i].taskc+ projectdata[i].taskn, completedTasks: projectdata[i].taskc},
-  )
-}
-const averageCompletionRate =
-  (projects.reduce((sum, project) => sum + project.completedTasks, 0) /
-    projects.reduce((sum, project) => sum + project.totalTasks, 0)) *
-  100;
-
-const collaboratorColors = {
-  Alice: "#2BA0B4",
-  Bob: "#BEC7E7",
-  Steven: "#B7DBD1",
-};
+import axios from "axios";
 
 
 const Home = () => {
 
 
 
-const user = JSON.parse(localStorage.getItem("user"));
 
-if (user) {
+
+const user = JSON.parse(localStorage.getItem("user"));
+//const user={id:2, name:"John"} ;
+ if (user) {
   console.log("User ID:", user.id);
   console.log("User Role:", user.name);
 } else {
@@ -64,22 +36,58 @@ const employeename=user.name;
 ///####///
 
 
+const [projectdata, newData2] = useState( []);
+let url="http://localhost:8000/testindividualtasks.php?empID="+user.id;///send emp id
+useEffect(() => {
+  const fetchSchedule = async () => {
+    const response = await fetch(url);
+    if (!response.ok) throw response;
+    const json = await response.json();
+    newData2(json);
+    console.log(json);
+  }
+  fetchSchedule();
+}, [])
+//projectdata should hold: [project1,com,unc],[project2,com,unc]
+const projects = [ 
+{ }
+];
+
+console.log("pizza");
+  console.log(projectdata);
+  console.log(newData2);
+console.log("b");
+
+for(var i=0;i<projectdata.length;i++){
+projects.push(
+  {name: projectdata[i].title, totalTasks:projectdata[i].taskc+ projectdata[i].taskn, completedTasks: projectdata[i].taskc},
+)
+}
+const averageCompletionRate =
+(projects.reduce((sum, project) => sum + project.completedTasks, 0) /
+  projects.reduce((sum, project) => sum + project.totalTasks, 0)) *
+100;
+
+///const collaboratorColors = {Alice: "#2BA0B4",Bob: "#BEC7E7",Steven: "#B7DBD1",};
   
   //
-  const [post1data, newData] = useState(null);
-  let url="http://localhost:8000/testtopics.php"
+  const [post1data, newData] = useState({});
+  let url3="http://localhost:8000/testtopics.php";
   useEffect(() => {
-      fetch(url )
-    .then((response) => response.json())
-    .then(newData)
+      fetch(url3 )
+    .then((response) => {
+      if(response.ok){
+      return response.json()}
+    else{throw response}})
+    .then(data => {newData(data)})
   //  .then(json => {   console.log('parsed json', json)}
     .catch(error => console.error('Error fetching data:', error));
 },[]);
 const [listdata, newData1] = useState(null);
 let url2="http://localhost:8000/testlist.php.php?empID="+user.id;
 useEffect(() => {
-  //need to acutually send the logged in user's id...how?? id love it if another page when _Logging_ in could send a cookie or soemthing
-    fetch(url2,{headers:{accept:"application/json" }} )
+ 
+  fetch(url2,{headers:{accept:"application/json" }} )
   .then((response) => response.json())
   .then(newData1)
   .catch(error => console.error('Error fetching data2:', error));
@@ -87,7 +95,7 @@ useEffect(() => {
   //###########
   const [date, setDate] = useState(new Date());
 console.log("pizza");
-  console.log(post1data);
+  console.log(post1data );
   console.log(newData);
 console.log("a");
   //######
@@ -199,14 +207,79 @@ const saveTask = () => {
       // If no change in progress, just update the existing task
       updatedTasks[editingTaskColumn][taskIndex] = newTask;
     }
+
+    //####  send to database here
+    savetaskdata(tasks);
+    
   } else {
     // Add new task
     updatedTasks[newTask.currentProgress].push(newTask);
+    //######  send it to database here
+    savetaskdata(tasks);
   }
 
   setTasks1(updatedTasks);
   resetForm();
 };
+const savetaskdata =(tasks)=>{
+  //tasks.todo, tasks.inProgress,tasks.done are all eahc separate lists to json and map?
+  //json in order user.id, task.todo.title, desc, todo, deadline
+ // tasks.todo[i].title
+ const url4="http://localhost:8000/savestasks.php";
+
+ const sendjson={};
+for (var i=0;i<tasks.todo.length;i++){
+sendjson.push({
+  id:user.id,
+  title:  tasks.todo[i].title,
+description:tasks.todo[i].description,
+currentProgress: "todo",
+deadline: tasks.todo[i].deadline
+
+}
+)
+
+}//for 1
+for (var i=0;i<tasks.inProgress.length;i++){
+  sendjson.push({
+    id:user.id,
+    title:  tasks.inProgress[i].title,
+  description:tasks.inProgress[i].description,
+  currentProgress: "inProgress",
+  deadline: tasks.inProgress[i].deadline
+  
+  }
+  )
+  
+  }//for 2
+  for (var i=0;i<tasks.done.length;i++){
+    sendjson.push({
+      id:user.id,
+      title:  tasks.done[i].title,
+    description:tasks.done[i].description,
+    currentProgress: "done",
+    deadline: tasks.done[i].deadline
+    
+    }
+    )
+    
+    }//for 3
+
+    //need to fetch now
+    
+
+
+     // const formData = new FormData();
+
+      formData.append('avatar',file)
+
+      return  axios.post(this.url4, sendjson,{
+          headers: {
+              'content-type': 'multipart/form-data'
+          }
+      });
+    
+}//e
 
 // Function to reset the form
 const resetForm = () => {
@@ -241,9 +314,9 @@ const deleteTask = (taskTitle, column) => {
     (task) => task.title !== taskTitle
   );
   setTasks1(updatedTasks);
+  savetaskdata(tasks);
 };
-
-
+ 
 
 //end of that
 
@@ -253,12 +326,12 @@ const deleteTask = (taskTitle, column) => {
       <main className="main-content">
         {/* Header */}
         <div className="top-bar">
-          <span className="header-text">Good Morning, {"employeename"} 👋</span>
+          <span className="header-text">Good Morning, {employeename} 👋</span>
           <div className="main-user-info">
             <FontAwesomeIcon icon={faBell} className="bell-icon" />
             <div className="user-avatar">
               <Avatar
-                name={"employeename"}
+                name={employeename}
                 round={true}
                 size="50"
                 color="#0a6476"
@@ -277,6 +350,7 @@ const deleteTask = (taskTitle, column) => {
               <div className="overview-charts">
                 {/* Pie Chart for Average Completion Rate */}
                 <div className="average-completion-pie">
+                <br/>
          <Typography>Project Completion Efficiency</Typography>
                   <PieChart
                     series={[
