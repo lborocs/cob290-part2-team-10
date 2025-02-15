@@ -1,10 +1,8 @@
 <?php
 // Allow cross-origin requests (for local development)
-
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Origin");
 header("Access-Control-Allow-Methods: POST, OPTIONS"); // Ensure OPTIONS is handled for preflight requests
-header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow Authorization header if needed
+header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow Authorisation header if needed
 header("Access-Control-Allow-Credentials: true"); // Allow credentials if using sessions or cookies
 header("Content-Type: application/json");  // Ensure JSON response format
 error_reporting(E_ALL);
@@ -31,18 +29,18 @@ if ($conn->connect_error) {
     die(json_encode([
         "status" => "error", 
         "error" => "Database connection failed",
-        "db_status" => "not_connected"  // Explicitly set db_status
+        "db_status" => "not_connected"  
     ]));
 }
 
 // Read JSON input from React frontend
 $rawData = file_get_contents("php://input");
-error_log("Received raw data: " . $rawData);  // Log raw data to error log (use cautiously in production)
+error_log("Received raw data: " . $rawData);  // Log raw data to error log 
 
 if (!$rawData) {
     die(json_encode(["status" => "error", 
                      "error" => "No input data received",
-                    "db_status" => "connected"  // Add db_status for consistency
+                    "db_status" => "connected"  
                     ]));
 }
 
@@ -53,7 +51,7 @@ $data = json_decode($rawData, true);
 if (!$data || !isset($data["Email"]) || !isset($data["Password"])) {
     die(json_encode(["status" => "error", 
                      "error" => "Invalid input data", 
-                     "db_status" => "connected"  // Add db_status for consistency
+                     "db_status" => "connected"  
     ]));
 }
 
@@ -69,22 +67,22 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
-// Verify user existence and password
-if ($user && $password === $user["Password"]) {
-    // Set cookies for UserID and Role
 
-    echo json_encode([
-        "status" => "success",
-        "db_status" => "connected", // Add this line to log connection status
-        "user" => [
-            "id" => $user["UserID"],
-            "username" => $user["Username"],
-            "email" => $email,
-            "role" => $user["Role"] == 1 ? "manager" : "user"  // Show 'manager' or 'user'
-        ]
-    ]);
-} else {
-    echo json_encode(["status" => "error", "error" => "Invalid login credentials",  "db_status" => "connected"]);
+if ($user){
+    if (password_verify($password, $user["Password"])) {
+        echo json_encode([
+            "status" => "success",
+            "db_status" => "connected", /
+            "user" => [
+                "id" => $user["UserID"],
+                "username" => $user["Username"],
+                "email" => $email,
+                "role" => $user["Role"]
+            ]
+        ]);
+    }else {
+        echo json_encode(["status" => $password, "error" => $user["Password"],  "db_status" => password_verify($password, $user["Password"])]);
+    }
 }
 
 // Close connection
