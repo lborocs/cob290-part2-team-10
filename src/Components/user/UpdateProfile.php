@@ -8,6 +8,8 @@ header("Content-Type: application/json");  // Ensure JSON response format
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+$response = array();
+
 // Handle preflight OPTIONS request (important for CORS)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -24,34 +26,52 @@ $database = "team010";
 // Connect to MySQL
 $conn = new mysqli($servername, $username, $password, $database);
 
-// Check connection
+// Check database connection
 if ($conn->connect_error) {
-    die(json_encode([
-        "status" => "error", 
-        "error" => "Database connection failed",
-        "db_status" => "not_connected"  // Explicitly set db_status
-    ]));
-}
-
-$data = json_decode(file_get_contents("php://input"), true);
-if (isset($data['email'], $data['preferredName'])) {
-    $email = $data['email'];
-    $preferredName = $data['preferredName'];
-
-    $query = "UPDATE employee SET preferredName = ? WHERE email = ?";
-    
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("ss", $preferredName, $email);
-    
-    if ($stmt->execute()) {
-        echo json_encode(["status" => "success"]);
-    } else {
-        echo json_encode(["error" => "Failed to update profile"]);
-    }
-    
-    $stmt->close();
-    $conn->close();
+  $response["status"] = "error";
+  $response["message"] = "Connection failed: " . $conn->connect_error;
+  echo json_encode($response);
+  exit(); // Exit after sending error response
 } else {
-    echo json_encode(["error" => "Invalid input"]);
+  $response["status"] = "success";
+  $response["message"] = "Database connected successfully";
 }
+$data = json_decode(file_get_contents("php://input"), true);
+
+// Check if JSON was received correctly
+if (!$data) {
+    echo json_encode([
+        "error" => "Invalid JSON received",
+        "data" => file_get_contents("php://input")
+    ]);
+    exit();
+}
+
+// Check if required fields exist
+if (!isset($data['UserID'], $data['PreferredName'])) {
+    echo json_encode($response);
+    exit();
+}
+
+// Extract values after validation
+$UserID = $data['UserID'];
+$preferredName = $data['PreferredName'];
+
+// Log received data
+error_log("UserID: $UserID, PreferredName: $preferredName");
+
+// Prepare SQL query
+$query = "UPDATE Employee SET PreferredName = ? WHERE UserID = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("si", $preferredName, $UserID);
+
+if ($stmt->execute()) {
+    echo json_encode(["status" => "success"]);
+} else {
+    echo json_encode(["error" => "Failed to update profile"]);
+}
+
+// Close statement and database connection
+$stmt->close();
+$conn->close();
 ?>
