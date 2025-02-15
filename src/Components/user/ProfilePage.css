@@ -8,8 +8,8 @@
 .profile-page-container {
   flex: 1;
   padding: 20px;
-  /* margin-left: 270px; Adjust for sidebar */
 }
+
 .profilepage-title {
   text-transform: uppercase;
   display: flex;
@@ -39,16 +39,16 @@
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   padding: 20px;
 }
+
 .profile-user-profile {
   display: flex;
-  /* flex-direction: ; */
-  /* justify-content: center; */
-  /* align-items: center; */
   grid-area: 1 / 1 / 6 / 4;
 }
+
 .profile-admin-controls {
   grid-area: 1 / 4 / 6 / 6;
 }
+
 .profile-admin-controls h2 {
   font-size: 20px;
   margin-bottom: 15px;
@@ -59,25 +59,57 @@
 }
 .profile-user-image {
   width: 35%;
+  text-align: center; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.profile-user-image img {
-  /* display: flex; */
-  /* justify-content: center; */
-  background-color: #0a6476;
-  width: 170px;
-  padding: 5px;
-  margin: 20% 10% 10% 10%;
-  height: 170px;
+
+.user-profile-icon {
+  background-color: #0a6476; 
+  width: 170px; 
+  height: 170px; 
+  padding: 8px;
   border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 15rem; 
+  margin-top: 30px;
 }
+
+/* Responsive Design */
+@media (max-width: 1024px) { /* Tablets */
+  .user-profile-icon {
+    width: 140px;
+    height: 140px;
+    font-size: 4rem;
+  }
+}
+
+@media (max-width: 768px) { /* Mobile Devices */
+  .user-profile-icon {
+    width: 120px;
+    height: 120px;
+    font-size: 3.5rem;
+  }
+}
+
+@media (max-width: 480px) { /* Small Phones */
+  .user-profile-icon {
+    width: 100px;
+    height: 100px;
+    font-size: 3rem;
+  }
+}
+
 .change-pic-label {
   font-size: x-large;
   width: 100%;
   margin-left: 20%;
   color: #0a6476;
 }
+
 .profile-user-details,
 .profile-password-management {
   display: flex;
@@ -87,10 +119,26 @@
   padding-left: 6%;
   background-color: #f8f8f8;
   margin-bottom: 10%;
-
   border-radius: 10px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
+.profile-user-details button {
+  margin-top: 5px;
+  padding: 10px 15px;
+  background-color: #ecf2f5;
+  color: #0a6476;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .profile-user-details button {
+    margin-top: 0px;
+  }
+}
+
+
 .user-change-details {
   width: 65%;
   padding-top: 0%;
@@ -109,14 +157,13 @@ button {
   border-radius: 4px;
   cursor: pointer;
 }
+
 .manage-users-section {
   margin-bottom: 20px;
   border: 1px solid #ffffff;
   border-radius: 10px;
-  /*background-color: #f9f9f9;*/
   padding: 10px;
   padding-top: 0%;
-  padding: 10px;
   overflow: auto;
 }
 
@@ -167,4 +214,50 @@ button {
 
 .user-table .delete-btn {
   background-color: #f44336;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .profile-grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .profile-user-profile {
+    grid-area: 1 / 1 / 6 / 3;
+  }
+  .profile-admin-controls {
+    grid-area: 1 / 3 / 6 / 5;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-grid-container {
+    grid-template-columns: 1fr;
+  }
+  .profile-user-profile {
+    grid-area: 1 / 1 / 6 / 2;
+  }
+  .profile-admin-controls {
+    grid-area: 2 / 1 / 6 / 2;
+  }
+
+  .profile-user-image img {
+    width: 120px;
+    height: 120px;
+    margin: 10% 20%;
+  }
+
+  .profile-user-details,
+  .profile-password-management {
+    padding-left: 4%;
+    gap: 10px;
+  }
+
+  .user-change-details {
+    width: 100%;
+  }
+
+  button {
+    width: 100%;
+    margin: 10px 0;
+  }
 }
