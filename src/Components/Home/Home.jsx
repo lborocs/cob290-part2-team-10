@@ -271,7 +271,7 @@ for (var i=0;i<tasks.inProgress.length;i++){
 
      // const formData = new FormData();
 
-      formData.append('avatar',file)
+     // formData.append('avatar',file)
 
       return  axios.post(this.url4, sendjson,{
           headers: {
