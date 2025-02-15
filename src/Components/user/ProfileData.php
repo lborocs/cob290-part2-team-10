@@ -1,36 +1,66 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET");
-header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json");
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "profileSection";
+// Initialise response array
+$response = array();
 
-// Create connection
+// Handle preflight request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+// Database credentials
+$servername = "sci-project.lboro.ac.uk"; //localhost
+$username = "team010"; 
+$password = "KsMzcqzsYEbKw4UWyvVT"; 
+$dbname = "team010"; 
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+// Check database connection
 if ($conn->connect_error) {
-    die(json_encode(["status" => "error", "message" => "Connection failed: " . $conn->connect_error]));
+  $response["status"] = "error";
+  $response["message"] = "Connection failed: " . $conn->connect_error;
+  echo json_encode($response);
+  exit(); // Exit after sending error response
+} else {
+  $response["status"] = "success";
+  $response["message"] = "Database connected successfully";
 }
 
-// Check if email parameter is set
-if (!isset($_GET['email'])) {
-    die(json_encode(["status" => "error", "message" => "Email parameter missing"]));
+// Validate userID parameter
+if (!isset($_GET['UserID'])) {
+  $response["status"] = "error";
+  $response["message"] = "UserID parameter missing";
+  echo json_encode($response);
+  exit(); // Exit after sending error response
 }
+$userID = intval($_GET['UserID']); // Convert to integer for security
 
-$email = $conn->real_escape_string($_GET['email']);
+// Fetch user profile based on UserID
+$sql = "
+    SELECT e.Name AS name, e.Email AS email, e.PreferredName AS preferredName, r.Name AS position
+    FROM Employee e
+    JOIN Role r ON e.Role = r.ID
+    WHERE e.UserID = $userID
+";
 
-$sql = "SELECT email, preferredName, position FROM employee WHERE email = '$email'";
+
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    echo json_encode($row);
+  $row = $result->fetch_assoc();
+  // Combine status and user data
+  $response["user"] = $row;
+  echo json_encode($response);
 } else {
-    echo json_encode(["status" => "error", "message" => "No user found"]);
+  $response["status"] = "error";
+  $response["message"] = "No user found";
+  echo json_encode($response);
 }
 
 $conn->close();
