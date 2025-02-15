@@ -22,8 +22,6 @@ const ProfilePage = ({ isAdmin }) => {
   const [loading, setLoading] = useState(false); // Added loading state
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
-  console.log("User ID from state:", userId); // ensure the id structure is correct
-  console.log("User ID:", user?.id);
  
 
 
@@ -62,11 +60,8 @@ const ProfilePage = ({ isAdmin }) => {
         }
   
         const data = await response.json();
-        console.log('Fetched profile data1:', data.status); //debugging
-        console.log('Fetched profile data2:', data.user); //debugging
         // Check if the response status is 'success' before setting the profile data
         if (data.status === 'success') {
-          console.log('Fetched profile dataaaaaa:');
           setProfileData({
             preferredName: data.user.preferredName, // Use stored name if available
             email: data.user.email,
@@ -140,10 +135,6 @@ const ProfilePage = ({ isAdmin }) => {
       alert("UserID not found. Please refresh the page.");
       return;
     }
-
-    // Log the UserID to check its value
-    console.log("User ID handlePasswordChange:", userId);
-
     setLoading(true);
 
     try {
@@ -168,8 +159,6 @@ const ProfilePage = ({ isAdmin }) => {
         UserID: userId,
         newPassword: newPassword
       });
-      console.log("Server Response:", data);
-
       if (data.status === "success") {
         alert("Password changed successfully!");
         setNewPassword("");
