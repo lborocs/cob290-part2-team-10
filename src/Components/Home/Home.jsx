@@ -220,6 +220,7 @@ const savetaskdata =(tasks)=>{
  const url4="http://localhost:8000/savestasks.php";
 
  const sendjson={0:{}};
+ if(tasks.todo.length>0){
 for (var i=0;i<tasks.todo.length;i++){
   sendjson.i={ 
       id:user.id,
@@ -231,7 +232,8 @@ deadline: tasks.todo[i].deadline
 }
 
 
-}//for 1
+}//for 1}
+ if(tasks.inProgress.length>0){
 for (var i=tasks.todo.length;i<tasks.inProgress.length+tasks.todo.length;i++){
   sendjson.i={ 
     id:user.id,
@@ -243,7 +245,8 @@ for (var i=tasks.todo.length;i<tasks.inProgress.length+tasks.todo.length;i++){
   }
   
   
-  }//for 2
+  }//for 2}
+ if(tasks.done.length>0){
 for (var i=tasks.inProgress.length+tasks.todo.length;i<tasks.done.length+tasks.inProgress.length+tasks.todo.length;i++){
   sendjson.i={ 
     id:user.id,
@@ -255,7 +258,7 @@ for (var i=tasks.inProgress.length+tasks.todo.length;i<tasks.done.length+tasks.i
   }
   
   
-  }//for 3
+  }//for 3}
   //need to fetch now
 
   
