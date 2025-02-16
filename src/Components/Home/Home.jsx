@@ -14,8 +14,7 @@ import "react-calendar/dist/Calendar.css";
 import "./Home.css";
 import { TitleTwoTone } from "@mui/icons-material";
 import Typography from '@mui/material/Typography';
-import axios from "axios";
-
+ 
 
 const Home = () => {
 
@@ -252,33 +251,25 @@ for (var i=0;i<tasks.inProgress.length;i++){
   )
   
   }//for 2
-  for (var i=0;i<tasks.done.length;i++){
-    sendjson.push({
-      id:user.id,
-      title:  tasks.done[i].title,
-    description:tasks.done[i].description,
-    currentProgress: "done",
-    deadline: tasks.done[i].deadline
-    
-    }
-    )
-    
-    }//for 3
+for (var i=0;i<tasks.done.length;i++){
+  sendjson.push({
+    id:user.id,
+    title:  tasks.done[i].title,
+  description:tasks.done[i].description,
+  currentProgress: "done",
+  deadline: tasks.done[i].deadline
+  
+  }
+  )
+  
+  }//for 3
 
-    //need to fetch now
-    
+  //need to fetch now
 
-
-     // const formData = new FormData();
-
-     // formData.append('avatar',file)
-
-      return  axios.post(this.url4, sendjson,{
-          headers: {
-              'content-type': 'multipart/form-data'
-          }
-      });
-    
+  useEffect(() => {
+    fetch(url4, {body: sendjson,headers: {'Content-Type': 'application/json'} } )
+    .catch(error => console.error('Error sending json:', error));
+  },[]);
 }//e
 
 // Function to reset the form
