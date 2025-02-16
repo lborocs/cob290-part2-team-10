@@ -72,7 +72,7 @@ if ($user){
     if (password_verify($password, $user["Password"])) {
         echo json_encode([
             "status" => "success",
-            "db_status" => "connected", /
+            "db_status" => "connected",
             "user" => [
                 "id" => $user["UserID"],
                 "username" => $user["Username"],
@@ -81,7 +81,10 @@ if ($user){
             ]
         ]);
     }else {
-        echo json_encode(["status" => $password, "error" => $user["Password"],  "db_status" => password_verify($password, $user["Password"])]);
+        echo json_encode([
+            "status" => "error",
+            "error" => "Invalid password"
+        ]);
     }
 }
 
