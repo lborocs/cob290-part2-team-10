@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaThumbsUp, FaComments, FaPlus } from "react-icons/fa";
+import { FaThumbsUp, FaComments, FaPlus} from "react-icons/fa";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import Avatar from "react-avatar";
@@ -24,7 +24,7 @@ const Topics = () => {
 
   // NEW: Fetch topics from the backend on component mount
   useEffect(() => {
-    fetch("http://localhost:8080/get_topics.php")
+    fetch("http://localhost:8000/get_topics.php")
       .then((response) => response.json())
       .then((data) => {
         setTopics(data); // Update topics state with data from the database
@@ -58,7 +58,7 @@ const Topics = () => {
         comments: [],
       };
 
-      fetch("http://localhost:8080/add_topics.php", {
+      fetch("http://localhost:8000/add_topics.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newTopic),
@@ -72,6 +72,16 @@ const Topics = () => {
             // Also update local likes and comments state for the new topic
             setLikes((prev) => ({ ...prev, [newTopic.id]: 0 }));
             setComments((prev) => ({ ...prev, [newTopic.id]: [] }));
+            //need to do something here
+            const storedUser = localStorage.getItem("user");
+            const parsedUser = JSON.parse(storedUser);
+            if(parsedUser.createdPosts === undefined){
+              parsedUser.createdPosts = [data.topicId.toString()];
+              localStorage.setItem("user", JSON.stringify(parsedUser));
+            }else{
+              parsedUser.createdPosts.push(data.topicId.toString());// changed this to string as well if makes difference
+              localStorage.setItem("user", JSON.stringify(parsedUser));
+            }
           } else {
             alert("Failed to add topic: " + data.message);
           }
@@ -102,13 +112,13 @@ const Topics = () => {
   // Update the topic in the database when a like or comment is made
   const updateTopicInDatabase = (topicId, updatedLikes, updatedComments) => {
     const updateData = {
-      topicId,
+      topicId : topicId,
       likes: updatedLikes,
       comments: updatedComments,
     };
 
     // UPDATED: Correct URL with colon in the fetch request
-    fetch("http://localhost:8080/update_topic.php", {
+    fetch("http://localhost:8000/update_topic.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updateData),
@@ -124,12 +134,29 @@ const Topics = () => {
 
   const handleLike = (topicId) => {
     const newLikes = (likes[topicId] || 0) + 1;
-    setLikes((prev) => ({ ...prev, [topicId]: newLikes }));
     // Update the database with the new like count; preserve existing comments
     const topicComments = comments[topicId] || [];
-    updateTopicInDatabase(topicId, newLikes, topicComments);
-  };
-
+    const storedUser = localStorage.getItem("user");
+    const parsedUser = JSON.parse(storedUser);
+    if(parsedUser.topicsLiked === undefined){
+      updateTopicInDatabase(topicId, newLikes, topicComments);
+      parsedUser.topicsLiked=[topicId];
+      localStorage.setItem("user", JSON.stringify(parsedUser));
+      setLikes((prev) => ({ ...prev, [topicId]: newLikes }));
+    }
+    else if(!parsedUser.topicsLiked.includes(topicId)){
+        updateTopicInDatabase(topicId, newLikes, topicComments);
+        parsedUser.topicsLiked.push(topicId);
+        localStorage.setItem("user", JSON.stringify(parsedUser));
+        setLikes((prev) => ({ ...prev, [topicId]: newLikes }));
+      }else{
+        const reduceLikes = (likes[topicId] || 0) - 1;
+        updateTopicInDatabase(topicId, reduceLikes, topicComments);
+        parsedUser.topicsLiked =  parsedUser.topicsLiked.filter(id => id !== topicId);
+        localStorage.setItem("user", JSON.stringify(parsedUser));
+        setLikes((prev) => ({ ...prev, [topicId]: reduceLikes }));
+      }
+    };
   const handleAddComment = (topicId, commentText) => {
     if (commentText) {
       const updatedComments = [...(comments[topicId] || []), commentText];
@@ -143,6 +170,7 @@ const Topics = () => {
   const handleExpandTopic = (topic) => {
     setExpandedTopic(topic);
   };
+
 
   const handleCloseExpandedTopic = () => {
     setExpandedTopic(null);
@@ -247,7 +275,6 @@ const Topics = () => {
                   className="expanded-topic-image"
                 />
               )}
-
               <div className="expanded-comments-section">
                 <h4>Comments</h4>
                 {comments[expandedTopic.id]?.length > 0 ? (
