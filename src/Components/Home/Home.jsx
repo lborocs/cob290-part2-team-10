@@ -221,19 +221,19 @@ const savetaskdata =(tasks)=>{
 
  const sendjson={};
 for (var i=0;i<tasks.todo.length;i++){
-sendjson.push({
-  id:user.id,
+  sendjson.i.value={ 
+      id:user.id,
   title:  tasks.todo[i].title,
 description:tasks.todo[i].description,
 currentProgress: "todo",
 deadline: tasks.todo[i].deadline
 
 }
-)
+
 
 }//for 1
-for (var i=0;i<tasks.inProgress.length;i++){
-  sendjson.push({
+for (var i=tasks.todo.length;i<tasks.inProgress.length+tasks.todo.length;i++){
+  sendjson.i.value={ 
     id:user.id,
     title:  tasks.inProgress[i].title,
   description:tasks.inProgress[i].description,
@@ -241,11 +241,11 @@ for (var i=0;i<tasks.inProgress.length;i++){
   deadline: tasks.inProgress[i].deadline
   
   }
-  )
+  
   
   }//for 2
-for (var i=0;i<tasks.done.length;i++){
-  sendjson.push({
+for (var i=tasks.inProgress.length+tasks.todo.length;i<tasks.done.length+tasks.inProgress.length+tasks.todo.length;i++){
+  sendjson.i.value={ 
     id:user.id,
     title:  tasks.done[i].title,
   description:tasks.done[i].description,
@@ -253,10 +253,9 @@ for (var i=0;i<tasks.done.length;i++){
   deadline: tasks.done[i].deadline
   
   }
-  )
+  
   
   }//for 3
-
   //need to fetch now
 
   
