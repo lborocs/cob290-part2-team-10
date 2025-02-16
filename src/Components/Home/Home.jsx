@@ -259,10 +259,10 @@ for (var i=0;i<tasks.done.length;i++){
 
   //need to fetch now
 
-  useEffect(() => {
+  
     fetch(url4, {body: sendjson,headers: {'Content-Type': 'application/json'} } )
     .catch(error => console.error('Error sending json:', error));
-  },[]);
+ 
 }//e
 
 // Function to reset the form
