@@ -25,7 +25,7 @@ const Topics = () => {
 
   // NEW: Fetch topics from the backend on component mount
   useEffect(() => { 
-    fetch("http://localhost:8000/get_topics.php")
+    fetch("http://localhost:8000/Posts/get_topics.php")
       .then((response) => response.json())
       .then((data) => {
         setTopics(data); // Update topics state with data from the database
@@ -59,7 +59,7 @@ const Topics = () => {
         comments: [],
       };
 
-      fetch("http://localhost:8000/add_topics.php", {
+      fetch("http://localhost:8000/Posts/add_topics.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newTopic),
@@ -120,7 +120,7 @@ const Topics = () => {
     };
 
     // UPDATED: Correct URL with colon in the fetch request
-    fetch("http://localhost:8000/update_topic.php", {
+    fetch("http://localhost:8000/Posts/update_topic.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updateData),
@@ -169,7 +169,7 @@ const Topics = () => {
       const storedUser = localStorage.getItem("user");
       const parsedUser = JSON.parse(storedUser);
       if(parsedUser.role === 1){
-        fetch("http://localhost:8000/delete_topics.php", {
+        fetch("http://localhost:8000/Posts/delete_topics.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({topicId:topicId}),
@@ -195,7 +195,7 @@ const Topics = () => {
         if(parsedUser.createdPosts !== undefined){
           console.log(topicId); 
           if(parsedUser.createdPosts.includes(topicId)){
-              fetch("http://localhost:8000/delete_topics.php", {
+              fetch("http://localhost:8000/Posts/delete_topics.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify( {topicId:topicId, UserID: parsedUser.id}),
