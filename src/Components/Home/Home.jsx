@@ -219,9 +219,9 @@ const savetaskdata =(tasks)=>{
  // tasks.todo[i].title
  const url4="http://localhost:8000/savestasks.php";
 
- const sendjson={};
+ const sendjson={0:{}};
 for (var i=0;i<tasks.todo.length;i++){
-  sendjson.i.value={ 
+  sendjson.i={ 
       id:user.id,
   title:  tasks.todo[i].title,
 description:tasks.todo[i].description,
@@ -233,7 +233,7 @@ deadline: tasks.todo[i].deadline
 
 }//for 1
 for (var i=tasks.todo.length;i<tasks.inProgress.length+tasks.todo.length;i++){
-  sendjson.i.value={ 
+  sendjson.i={ 
     id:user.id,
     title:  tasks.inProgress[i].title,
   description:tasks.inProgress[i].description,
@@ -245,7 +245,7 @@ for (var i=tasks.todo.length;i<tasks.inProgress.length+tasks.todo.length;i++){
   
   }//for 2
 for (var i=tasks.inProgress.length+tasks.todo.length;i<tasks.done.length+tasks.inProgress.length+tasks.todo.length;i++){
-  sendjson.i.value={ 
+  sendjson.i={ 
     id:user.id,
     title:  tasks.done[i].title,
   description:tasks.done[i].description,
