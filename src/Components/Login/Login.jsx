@@ -27,7 +27,7 @@ const Login = ({ onLoginSuccess }) => {
     console.log("Sending data to PHP:", { Email: email, Password: password });
   
     try {
-      const response = await fetch("http://localhost:8000/Login2.php", {
+      const response = await fetch("http://localhost:8000/Login/Login2.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ Email: email, Password: password }), // Match PHP expected keys
@@ -80,7 +80,7 @@ const Login = ({ onLoginSuccess }) => {
     var test = true; 
     try {
       // Fetch registered emails from the backend
-      const response = await fetch("http://localhost:8000/src/Components/Login/RegistrationVerification.php", {
+      const response = await fetch("http://localhost:8000/Login/RegistrationVerification.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ Email: email }) ,
@@ -123,7 +123,7 @@ const Login = ({ onLoginSuccess }) => {
   const handleRegisterSubmit = async () =>{
     setError("");
       try {
-        const response = await fetch("http://localhost:8000/src/Components/Login/Registration.php", {
+        const response = await fetch("http://localhost:8000/Login/Registration.php", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -189,7 +189,7 @@ const Login = ({ onLoginSuccess }) => {
     }
   
     try {
-      const response = await fetch("http://localhost:8000/src/Components/Login/ForgotPassword.php", {
+      const response = await fetch("http://localhost:8000/Login/ForgotPassword.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, newPassword }),
