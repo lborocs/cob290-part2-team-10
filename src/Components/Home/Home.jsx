@@ -52,10 +52,6 @@ const projects = [
 { }
 ];
 
-console.log("pizza");
-  console.log(projectdata);
-  console.log(newData2);
-console.log("b");
 
 for(var i=0;i<projectdata.length;i++){
 projects.push(
@@ -93,10 +89,7 @@ useEffect(() => {
 },[]);
   //###########
   const [date, setDate] = useState(new Date());
-console.log("pizza");
-  console.log(post1data );
-  console.log(newData);
-console.log("a");
+
   //######
 const projectData = [{  }];
 var n=0;
