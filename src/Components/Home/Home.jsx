@@ -232,7 +232,8 @@ deadline: tasks.todo[i].deadline
 }
 
 
-}//for 1}
+}//for 1
+}
  if(tasks.inProgress.length>0){
 for (var i=tasks.todo.length;i<tasks.inProgress.length+tasks.todo.length;i++){
   sendjson.i={ 
@@ -245,7 +246,8 @@ for (var i=tasks.todo.length;i<tasks.inProgress.length+tasks.todo.length;i++){
   }
   
   
-  }//for 2}
+  }//for 2
+  }
  if(tasks.done.length>0){
 for (var i=tasks.inProgress.length+tasks.todo.length;i<tasks.done.length+tasks.inProgress.length+tasks.todo.length;i++){
   sendjson.i={ 
@@ -258,7 +260,8 @@ for (var i=tasks.inProgress.length+tasks.todo.length;i<tasks.done.length+tasks.i
   }
   
   
-  }//for 3}
+  }//for 3
+  }
   //need to fetch now
 
   
