@@ -1,10 +1,11 @@
 /* Main Content */
 .topics-content {
-  /* padding: 20px;
-  padding-top: 35px; */
+  width: 275px; /* Fixed width */
+  max-width: 100%; /* Prevents overflow */
   display: flex;
   flex-direction: column; /* Stack elements vertically */
   align-items: center; /* Center align items */
+  justify-content: space-between;
   font-size: 36px;
   color: #000000;
   margin-bottom: 20px;
@@ -43,7 +44,6 @@
   gap: 10px;
   width: 75vw;
   justify-items: center; /* Center items horizontally */
-  /* height: 75vh; */
 }
 
 .topic-card {
@@ -52,7 +52,7 @@
   border-radius: 8px;
   width: 275px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  overflow: visible;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -61,6 +61,7 @@
   cursor: pointer;
   padding-bottom: 10px;
   position: relative;
+  min-height: fit-content; /* Allow card to expand based on content */
 }
 
 .topic-image {
@@ -101,13 +102,15 @@
   /* margin-top: auto; */
   width: 100%;
   display: flex;
-  justify-content: space-around;
-  padding: 5px 0;
+  justify-content: space-between;
+  gap: 5px; /* Adds spacing between buttons */
+  padding: 5px;
+  box-sizing: border-box; /* Ensures padding does not expand width */
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
 }
 
 /* Hover effect for topic cards */
 .topic-card:hover {
-  height: auto; /* Allow expansion on hover */
   max-height: 300px;
   cursor: pointer;
 }
@@ -141,13 +144,14 @@
 }
 
 .actions button {
-  background-color: #0a6476;
-  color: #ecf2f5;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
+  flex: 1; /* Distribute space evenly */
+  min-width: 80px; /* Ensures they don't shrink too much */
+  max-width: 120px; /* Prevents overflow */
+  white-space: nowrap; /* Prevents text wrapping */
+  text-align: center;
+  padding: 8px 12px;
 }
+
 
 .actions button:hover {
   background-color: #ecf2f5;
@@ -157,11 +161,7 @@
 /* Comment Section */
 .comment-section {
   margin-top: 10px;
-  display: none; /* Hidden by default */
-}
-
-.topic-card:hover .comment-section {
-  display: block; /* Show on hover */
+  display: block; /* Hidden by default */
 }
 
 .add-comment {
@@ -222,12 +222,16 @@
   border: none;
   border-radius: 50%;
   color: white;
+  width: 50px; /* Ensure a fixed width */
+  height: 50px; /* Ensure a fixed height */
   padding: 10px;
-  padding-bottom: 5px;
-  cursor: pointer;
   font-size: 24px;
+  cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
+  display: inline-block; /* Prevents flex/grid stretch */
+  max-width: 60px; /* Ensures it never expands beyond this */
 }
+
 
 .floating-button.clicked {
   background-color: #616161;
@@ -305,17 +309,20 @@ button {
   color: white;
   border-radius: 80px;
   height: 37px;
-  width: 80%;
+  width: 90%;
   position: relative;
+  justify-content: space-between;
   margin-bottom: 20px;
+  padding: 8px;
+  align-items: center;
   margin-top: 20px;
 }
 
 .filter-buttons button {
-  flex: 1;
+  flex: 1 1;
   border: none;
   background: transparent;
-  padding: 0px;
+  padding: 8px 10px;
   cursor: pointer;
   position: relative;
   border-radius: 8px;
@@ -325,6 +332,7 @@ button {
   font-family: "Abel";
   font-weight: 700;
   text-transform: uppercase;
+  text-align: center;
 }
 
 .filter-buttons button:not(:last-child) {
@@ -341,7 +349,6 @@ button {
   border-radius: 80px;
   margin: 2px;
   font-family: "Abel";
-  /* font-size: medium; */
   letter-spacing: 1px;
   color: #333;
   font-weight: 400;
@@ -361,18 +368,6 @@ button {
   left: 0; /* Align to the left */
   transition: left 0.3s ease; /* Smooth transition */
 }
-
-/* Category label */
-/* .category-label {
-  font-size: 0.9rem;
-  font-weight: bold;
-  padding: 5px;
-  border-radius: 5px;
-  color: white;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-} */
 
 .category-label.technical {
   background-color: #28a745;
@@ -403,3 +398,75 @@ button {
   color: white;
   border-color: #007bff;
 }
+
+/* Responsive Grid */
+@media (max-width: 1200px) {
+  .topics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Adjust columns dynamically */
+    width: 85vw;
+  }
+}
+
+@media (max-width: 1024px) {
+  .topics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    width: 90vw;
+  }
+
+  .topics-header, .topics-content {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .topics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ensure at least 2 cards per row */
+    width: 95vw;
+  }
+
+  .topics-header, .topics-content {
+    font-size: 24px;
+  }
+
+  .topic-card {
+    width: 100%;
+  }
+  .actions {
+    flex-direction: row; /* Ensures buttons stay in a row */
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .floating-button {
+    bottom: 15px;
+    right: 15px;
+    padding: 12px;
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Ensure 1 card per row */
+    width: 98vw;
+  }
+
+  .topics-header, .topics-content {
+    font-size: 20px;
+  }
+
+  .floating-button {
+    bottom: 10px;
+    right: 10px;
+    padding: 10px;
+    font-size: 20px;
+    display: inline-block; /* Prevents flex/grid stretch */
+    max-width: 60px; /* Ensures it never expands beyond this */
+  }
+
+  .expanded-topic-content {
+    width: 95%;
+    height: 70vh;
+  }
+}
+
