@@ -48,7 +48,7 @@ const ProfilePage = ({ isAdmin }) => {
       try {
         console.log("Fetching profile data for UserID:", userId);
         const response = await fetch(
-          `http://localhost:8000/src/Components/user/ProfileData.php?UserID=${user.id}`
+          `http://localhost:8000/user/ProfileData.php?UserID=${user.id}`
         );
         if (!userId) {
           console.error("User ID missing");
@@ -87,7 +87,7 @@ const ProfilePage = ({ isAdmin }) => {
         UserID: user.id,
         PreferredName: profileData?.preferredName,
       };
-      const response = await fetch('http://localhost:8000/src/Components/user/UpdateProfile.php', {
+      const response = await fetch('http://localhost:8000/user/UpdateProfile.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ const ProfilePage = ({ isAdmin }) => {
       console.log("Payload being sent:", JSON.stringify(payload));
 
      console.log("Payload being sent:", payload);
-      const response = await fetch("http://localhost:8000/src/Components/user/ChangePassword.php", {
+      const response = await fetch("http://localhost:8000/user/ChangePassword.php", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json;',
