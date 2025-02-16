@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaThumbsUp, FaComments, FaPlus} from "react-icons/fa";
+import { FaThumbsUp, FaComments, FaPlus, FaTrash } from "react-icons/fa";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import Avatar from "react-avatar";
@@ -21,14 +21,15 @@ const Topics = () => {
   const [likes, setLikes] = useState({});
   const [filter, setFilter] = useState("");
   const [clicked, setClicked] = useState(false);
+  const[refresh,setRefresh] = useState([]);
 
   // NEW: Fetch topics from the backend on component mount
-  useEffect(() => {
+  useEffect(() => { 
     fetch("http://localhost:8000/get_topics.php")
       .then((response) => response.json())
       .then((data) => {
         setTopics(data); // Update topics state with data from the database
-        // Initialize likes and comments from fetched topics
+        // Initialise likes and comments from fetched topics
         const likesData = {};
         const commentsData = {};
         data.forEach((topic) => {
@@ -39,7 +40,7 @@ const Topics = () => {
         setComments(commentsData);
       })
       .catch((error) => console.error("Error fetching topics:", error));
-  }, []);
+  }, [refresh]);
 
   const toggleAddTopic = () => {
     setIsAddTopicOpen(!isAddTopicOpen);
@@ -72,15 +73,16 @@ const Topics = () => {
             // Also update local likes and comments state for the new topic
             setLikes((prev) => ({ ...prev, [newTopic.id]: 0 }));
             setComments((prev) => ({ ...prev, [newTopic.id]: [] }));
-            //need to do something here
             const storedUser = localStorage.getItem("user");
             const parsedUser = JSON.parse(storedUser);
             if(parsedUser.createdPosts === undefined){
               parsedUser.createdPosts = [data.topicId.toString()];
               localStorage.setItem("user", JSON.stringify(parsedUser));
+              setRefresh(!refresh);
             }else{
-              parsedUser.createdPosts.push(data.topicId.toString());// changed this to string as well if makes difference
+              parsedUser.createdPosts.push(data.topicId.toString());
               localStorage.setItem("user", JSON.stringify(parsedUser));
+              setRefresh(!refresh);
             }
           } else {
             alert("Failed to add topic: " + data.message);
@@ -157,6 +159,70 @@ const Topics = () => {
         setLikes((prev) => ({ ...prev, [topicId]: reduceLikes }));
       }
     };
+    const handleDeletePost = (topicId) => {
+       // Prompt the user for confirmation
+  const userConfirmed = window.confirm("Are you sure you want to delete this post?");
+  if (!userConfirmed) {
+    // If the user cancels, exit the function
+    return;
+  }
+      const storedUser = localStorage.getItem("user");
+      const parsedUser = JSON.parse(storedUser);
+      if(parsedUser.role === 1){
+        fetch("http://localhost:8000/delete_topics.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({topicId:topicId}),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              if(parsedUser.createdPosts !== undefined){
+                parsedUser.createdPosts =  parsedUser.createdPosts.filter(id => id !== topicId);
+                localStorage.setItem("user", JSON.stringify(parsedUser));
+              }
+            } else {
+              alert("Failed to delete topic: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error in deleting topic:", error);
+            alert("An error occurred. Please check console logs.");
+          });
+          setRefresh(!refresh);
+        alert("Manager wants to delete post"); 
+      }else{
+        if(parsedUser.createdPosts !== undefined){
+          console.log(topicId); 
+          if(parsedUser.createdPosts.includes(topicId)){
+              fetch("http://localhost:8000/delete_topics.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify( {topicId:topicId, UserID: parsedUser.id}),
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                    if(parsedUser.createdPosts !== undefined){
+                      parsedUser.createdPosts =  parsedUser.createdPosts.filter(id => id !== topicId);
+                      localStorage.setItem("user", JSON.stringify(parsedUser));
+                      setRefresh(!refresh);
+                  } else {
+                    alert("Failed to delete topic: " + data.message);
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error in deleting topic:", error);
+                  alert("An error occurred. Please check console logs.");
+                });
+            alert("You want to delete your own post");
+          }else{
+            alert("You cannot delete a post you did not create");  
+          }
+        }else{
+          alert("You haven't created any post you are able to delete")
+        }
+      }
+    }
   const handleAddComment = (topicId, commentText) => {
     if (commentText) {
       const updatedComments = [...(comments[topicId] || []), commentText];
@@ -242,6 +308,14 @@ const Topics = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        handleDeletePost(topic.id);
+                      }}
+                    >
+                      <FaTrash /> Delete
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
                         handleExpandTopic(topic);
                       }}
                     >
@@ -275,6 +349,7 @@ const Topics = () => {
                   className="expanded-topic-image"
                 />
               )}
+
               <div className="expanded-comments-section">
                 <h4>Comments</h4>
                 {comments[expandedTopic.id]?.length > 0 ? (
