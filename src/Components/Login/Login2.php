@@ -1,8 +1,8 @@
 <?php
 // Allow cross-origin requests (for local development)
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS, DELETE, PUT");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Methods: POST, OPTIONS"); // Ensure OPTIONS is handled for preflight requests
+header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow Authorisation header if needed
 header("Access-Control-Allow-Credentials: true"); // Allow credentials if using sessions or cookies
 header("Content-Type: application/json");  // Ensure JSON response format
 error_reporting(E_ALL);
@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-require_once('/var/www/html/cob290-part2-team-10/backend/config/db.php');
+require_once('../../../backend/config/db.php');
 // Read JSON input from React frontend
 $rawData = file_get_contents("php://input");
 error_log("Received raw data: " . $rawData);  // Log raw data to error log 
