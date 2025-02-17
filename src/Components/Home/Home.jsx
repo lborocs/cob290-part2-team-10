@@ -14,6 +14,7 @@ import "react-calendar/dist/Calendar.css";
 import "./Home.css";
 import { TitleTwoTone } from "@mui/icons-material";
 import Typography from '@mui/material/Typography';
+import { list } from "postcss";
  
 
 const Home = () => {
@@ -22,8 +23,8 @@ const Home = () => {
 
 
 
-//const user = JSON.parse(localStorage.getItem("user"));
-const user={id:2, name:"John"} ;
+const user = JSON.parse(localStorage.getItem("user"));
+//const user={id:2, name:"John"} ;
  if (user) {
   console.log("User ID:", user.id);
   console.log("User Role:", user.name);
@@ -97,11 +98,14 @@ useEffect(() => {
 },[]);
   //###########
   const [date, setDate] = useState(new Date());
-console.log("pizza");
-  console.log(listdata );//for tasks
+//  console.log(listdata );//for tasks
   try{
-  console.log(listdata.length);}catch(exception){console.log(listdata.length)}
-console.log("a");
+ // console.log(listdata.length);
+  }
+  catch(exception){
+  // console.log(listdata.length)
+  }
+///console.log("a");
   //######
 const projectData = [ ];//for posts
 var n=0;
@@ -135,24 +139,22 @@ const [tasks, setTasks1] = useState({
 //const a={0:[]};
 //a[0].push({one:'a'});
 //console.log(a);
-
- //below is not working right....... :,(
-var i=0;
+var f=false;
+if (tasks['todo'].length<1){  f=false;}else{f=true}
 try{
-  if(listdata.length>0){
-    while(i<listdata.length){
-      console.log(i+"ah"+listdata.length);
+  if (f==false && (tasks['todo'].length<1 ||tasks['inProgress'].length<1 ||tasks['done'].length<1)){
+    for(var i=0;i<listdata.length;i++){
+      //console.log(i+"ah"+listdata.length);
       if(listdata[i].currentProgress=="todo"){
         tasks['todo'].push(
-          
           {
             title: listdata[i]['title'],
             description: listdata[i]['description'],
             currentProgress: "todo",
             deadline: listdata[i]['deadline'],
-          },
+          });continue;
       
-      )};
+      };
 
       if (listdata[i].currentProgress=="InProgress"){
             tasks['inProgress'].push(
@@ -161,7 +163,11 @@ try{
               description: listdata[i]['description'],
               currentProgress: "inProgress",
               deadline: listdata[i]['deadline'],
-            },)};
+            });
+             
+           // console.log("p"); console.log(tasks["inProgress"]);
+           continue;
+          };
 
       if(newData1[i]['currentProgress']=="done"){
             tasks['done'].push(
@@ -172,10 +178,12 @@ try{
               deadline: listdata[i]['deadline'],
             })
 
-    };i++;
+    };
+     
     };//#for loop
-}
-}catch(exception){}
+   if(i==listdata.length){ f=true;}
+  }
+  }catch(exception){i++}
 
 
   
@@ -238,46 +246,49 @@ const savetaskdata =(tasks)=>{
   //json in order user.id, task.todo.title, desc, todo, deadline
  // tasks.todo[i].title
  const url4="http://localhost:8000/Home/savetasks.php";
-
+//console.log(tasks);
  const sendjson={0:{}};
  if(tasks.todo.length>0){
+  var temp=0;
 for (var i=0;i<tasks.todo.length;i++){
   sendjson.i={ 
       id:user.id,
-  title:  tasks.todo[i].title,
-description:tasks.todo[i].description,
+  title:  tasks['todo'][temp].title,
+description:tasks['todo'][temp].description,
 currentProgress: "todo",
-deadline: tasks.todo[i].deadline
+deadline: tasks['todo'][temp].deadline
 
-}
+};temp++;
 
 
 }//for 1
 }
- if(tasks.inProgress.length>0){
-for (var i=tasks.todo.length;i<tasks.inProgress.length+tasks.todo.length;i++){
+ if(tasks['inProgress'].length>0){
+  temp=0;
+for (var i=tasks.todo.length;i<tasks['inProgress'].length+tasks.todo.length;i++){
   sendjson.i={ 
     id:user.id,
-    title:  tasks.inProgress[i].title,
-  description:tasks.inProgress[i].description,
+    title:  tasks['inProgress'][temp].title,
+  description:tasks['inProgress'][temp].description,
   currentProgress: "inProgress",
-  deadline: tasks.inProgress[i].deadline
+  deadline: tasks['inProgress'][temp].deadline
   
-  }
+  };temp++;
   
   
   }//for 2
   }
  if(tasks.done.length>0){
-for (var i=tasks.inProgress.length+tasks.todo.length;i<tasks.done.length+tasks.inProgress.length+tasks.todo.length;i++){
+  temp=0;
+for (var i=tasks['inProgress'].length+tasks.todo.length;i<tasks['done'].length+tasks['inProgress'].length+tasks.todo.length;i++){
   sendjson.i={ 
     id:user.id,
-    title:  tasks.done[i].title,
-  description:tasks.done[i].description,
+    title:  tasks['done'][temp].title,
+  description:tasks['done'][temp].description,
   currentProgress: "done",
-  deadline: tasks.done[i].deadline
+  deadline: tasks['done'][temp].deadline
   
-  }
+  };temp++;
   
   
   }//for 3
@@ -321,7 +332,7 @@ const deleteTask = (taskTitle, column) => {
     (task) => task.title !== taskTitle
   );
   setTasks1(updatedTasks);
-  savetaskdata(tasks);
+ // savetaskdata(tasks);
 };
  
 
