@@ -27,7 +27,7 @@ if (!$conn) {
   die("Connection failed: " . mysqli_connect_error()); } 
 $taskjson=json_encode(file_get_contents('php://input'));
 $a=json_decode($taskjson);
-for ($i=0;$i<count($a) ; $i++){
+for ($i=0;$i<count($file_get_contents('php://input')) ; $i++){
 $q="Insert into To-Do-List (`employeeID`,`title`,`description`,`currentProgress`,`deadline`) values(".$taskjson[$i]['id'].",".$taskjson[$i]['title'].",".$taskjson[$i]['description'].",".$taskjson[$i]['currentProgress'].",".$taskjson[$i]['deadline'].")";
 $result = mysqli_query($conn,$q);
 $row = mysqli_fetch_array($result);
