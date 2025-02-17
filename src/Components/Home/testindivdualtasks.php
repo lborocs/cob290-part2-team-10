@@ -8,7 +8,7 @@ header("Content-Type: application/json");  // Ensure JSON response format
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$Servername="sci-project.lboro.ac.uk";
+$Servername="localhost";
 $Username="team010";
 $Password="KsMzcqzsYEbKw4UWyvVT";
 $Databasename="team010";
