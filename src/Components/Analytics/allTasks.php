@@ -1,27 +1,9 @@
 <?php
-// Enable error reporting for debugging
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // Set headers to allow cross-origin requests
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json; charset=UTF-8');
 header('Access-Control-Allow-Methods: GET');
-
-// Database connection
-$servername = "sci-project.lboro.ac.uk";
-$username = "team010";
-$password = "KsMzcqzsYEbKw4UWyvVT";
-$database = "team010";
-
-$conn = new mysqli($servername, $username, $password, $database);
-
-// Check connection
-if ($conn->connect_error) {
-  echo json_encode(["error" => "Database connection failed: " . $conn->connect_error]);
-  exit;
-}
+require_once('../../../backend/config/db.php');
 
 // Check if a project ID was sent
 if (!isset($_GET['project_id'])) {

@@ -14,25 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] == "OPTIONS") {
     exit();
 }
 
-
-// Database credentials
-$servername = "sci-project.lboro.ac.uk";
-$username = "team010";
-$password = "KsMzcqzsYEbKw4UWyvVT";
-$database = "team010";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $database);
-
-// Check connection
-if ($conn->connect_error) {
-    echo json_encode(["error" => "Database connection failed: " . $conn->connect_error]);
-    exit;
-}
+require_once('../../../backend/config/db.php');
 
 // Fetch projects
 // Get UserID from the request
-$UserID = isset($_GET['UserID']) ? intval($_GET['UserID']) : 0; 
+$UserID = isset($_GET['UserID']) ? intval($_GET['UserID']) : 0;
 
 // Fetch only projects assigned to this user
 $sql = "SELECT p.id, p.title, p.description, p.teamleader, e.Name AS team_leader
@@ -114,4 +100,3 @@ if (empty($projects)) {
 }
 
 $conn->close();
-?>

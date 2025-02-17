@@ -11,19 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-
-$servername = "sci-project.lboro.ac.uk";
-$username = "team010";
-$password = "KsMzcqzsYEbKw4UWyvVT";
-$database = "team010";
-
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-$conn = new mysqli($servername, $username, $password, $database, 3306);
-if ($conn->connect_error) {
-    echo json_encode(["success" => false, "message" => "Connection failed: " . $conn->connect_error]);
-    exit();
-}
-
+require_once('../../../backend/config/db.php');
 $query = "SELECT * FROM Topics ORDER BY created_at DESC";
 $result = $conn->query($query);
 $topics = [];
@@ -39,4 +27,3 @@ if ($result->num_rows > 0) {
 
 echo json_encode($topics);
 $conn->close();
-?>

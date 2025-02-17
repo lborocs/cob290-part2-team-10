@@ -13,35 +13,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-
-
-// Database credentials
-$servername = "sci-project.lboro.ac.uk";
-$username = "team010";
-$password = "KsMzcqzsYEbKw4UWyvVT";
-$database = "team010";
-
-// Connect to MySQL
-$conn = new mysqli($servername, $username, $password, $database);
-
-// Check connection
-if ($conn->connect_error) {
-    die(json_encode([
-        "status" => "error", 
-        "error" => "Database connection failed",
-        "db_status" => "not_connected"  
-    ]));
-}
-
+require_once('../../../backend/config/db.php');
 // Read JSON input from React frontend
 $rawData = file_get_contents("php://input");
 error_log("Received raw data: " . $rawData);  // Log raw data to error log 
 
 if (!$rawData) {
-    die(json_encode(["status" => "error", 
-                     "error" => "No input data received",
-                    "db_status" => "connected"  
-                    ]));
+    die(json_encode([
+        "status" => "error",
+        "error" => "No input data received",
+        "db_status" => "connected"
+    ]));
 }
 
 // Decode the JSON data
@@ -49,9 +31,10 @@ $data = json_decode($rawData, true);
 
 // Check if JSON decoding is successful and the required fields exist
 if (!$data || !isset($data["Email"]) || !isset($data["Password"])) {
-    die(json_encode(["status" => "error", 
-                     "error" => "Invalid input data", 
-                     "db_status" => "connected"  
+    die(json_encode([
+        "status" => "error",
+        "error" => "Invalid input data",
+        "db_status" => "connected"
     ]));
 }
 
@@ -68,7 +51,7 @@ $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
 
-if ($user){
+if ($user) {
     if (password_verify($password, $user["Password"])) {
         echo json_encode([
             "status" => "success",
@@ -80,7 +63,7 @@ if ($user){
                 "role" => $user["Role"]
             ]
         ]);
-    }else {
+    } else {
         echo json_encode([
             "status" => "error",
             "error" => "Invalid password"
@@ -91,4 +74,3 @@ if ($user){
 // Close connection
 $stmt->close();
 $conn->close();
-?>

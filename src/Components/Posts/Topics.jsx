@@ -21,10 +21,10 @@ const Topics = () => {
   const [likes, setLikes] = useState({});
   const [filter, setFilter] = useState("");
   const [clicked, setClicked] = useState(false);
-  const[refresh,setRefresh] = useState([]);
+  const [refresh, setRefresh] = useState([]);
 
   // NEW: Fetch topics from the backend on component mount
-  useEffect(() => { 
+  useEffect(() => {
     fetch("http://localhost:8000/Posts/get_topics.php")
       .then((response) => response.json())
       .then((data) => {
@@ -75,11 +75,11 @@ const Topics = () => {
             setComments((prev) => ({ ...prev, [newTopic.id]: [] }));
             const storedUser = localStorage.getItem("user");
             const parsedUser = JSON.parse(storedUser);
-            if(parsedUser.createdPosts === undefined){
+            if (parsedUser.createdPosts === undefined) {
               parsedUser.createdPosts = [data.topicId.toString()];
               localStorage.setItem("user", JSON.stringify(parsedUser));
               setRefresh(!refresh);
-            }else{
+            } else {
               parsedUser.createdPosts.push(data.topicId.toString());
               localStorage.setItem("user", JSON.stringify(parsedUser));
               setRefresh(!refresh);
@@ -114,7 +114,7 @@ const Topics = () => {
   // Update the topic in the database when a like or comment is made
   const updateTopicInDatabase = (topicId, updatedLikes, updatedComments) => {
     const updateData = {
-      topicId : topicId,
+      topicId: topicId,
       likes: updatedLikes,
       comments: updatedComments,
     };
@@ -140,89 +140,96 @@ const Topics = () => {
     const topicComments = comments[topicId] || [];
     const storedUser = localStorage.getItem("user");
     const parsedUser = JSON.parse(storedUser);
-    if(parsedUser.topicsLiked === undefined){
+    if (parsedUser.topicsLiked === undefined) {
       updateTopicInDatabase(topicId, newLikes, topicComments);
-      parsedUser.topicsLiked=[topicId];
+      parsedUser.topicsLiked = [topicId];
       localStorage.setItem("user", JSON.stringify(parsedUser));
       setLikes((prev) => ({ ...prev, [topicId]: newLikes }));
+    } else if (!parsedUser.topicsLiked.includes(topicId)) {
+      updateTopicInDatabase(topicId, newLikes, topicComments);
+      parsedUser.topicsLiked.push(topicId);
+      localStorage.setItem("user", JSON.stringify(parsedUser));
+      setLikes((prev) => ({ ...prev, [topicId]: newLikes }));
+    } else {
+      const reduceLikes = (likes[topicId] || 0) - 1;
+      updateTopicInDatabase(topicId, reduceLikes, topicComments);
+      parsedUser.topicsLiked = parsedUser.topicsLiked.filter(
+        (id) => id !== topicId
+      );
+      localStorage.setItem("user", JSON.stringify(parsedUser));
+      setLikes((prev) => ({ ...prev, [topicId]: reduceLikes }));
     }
-    else if(!parsedUser.topicsLiked.includes(topicId)){
-        updateTopicInDatabase(topicId, newLikes, topicComments);
-        parsedUser.topicsLiked.push(topicId);
-        localStorage.setItem("user", JSON.stringify(parsedUser));
-        setLikes((prev) => ({ ...prev, [topicId]: newLikes }));
-      }else{
-        const reduceLikes = (likes[topicId] || 0) - 1;
-        updateTopicInDatabase(topicId, reduceLikes, topicComments);
-        parsedUser.topicsLiked =  parsedUser.topicsLiked.filter(id => id !== topicId);
-        localStorage.setItem("user", JSON.stringify(parsedUser));
-        setLikes((prev) => ({ ...prev, [topicId]: reduceLikes }));
-      }
-    };
-    const handleDeletePost = (topicId) => {
-       // Prompt the user for confirmation
-  const userConfirmed = window.confirm("Are you sure you want to delete this post?");
-  if (!userConfirmed) {
-    // If the user cancels, exit the function
-    return;
-  }
-      const storedUser = localStorage.getItem("user");
-      const parsedUser = JSON.parse(storedUser);
-      if(parsedUser.role === 1){
-        fetch("http://localhost:8000/Posts/delete_topics.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({topicId:topicId}),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.success) {
-              if(parsedUser.createdPosts !== undefined){
-                parsedUser.createdPosts =  parsedUser.createdPosts.filter(id => id !== topicId);
-                localStorage.setItem("user", JSON.stringify(parsedUser));
-              }
-            } else {
-              alert("Failed to delete topic: " + data.message);
+  };
+  const handleDeletePost = (topicId) => {
+    // Prompt the user for confirmation
+    const userConfirmed = window.confirm(
+      "Are you sure you want to delete this post?"
+    );
+    if (!userConfirmed) {
+      // If the user cancels, exit the function
+      return;
+    }
+    const storedUser = localStorage.getItem("user");
+    const parsedUser = JSON.parse(storedUser);
+    if (parsedUser.role === 1) {
+      fetch("http://localhost:8000/Posts/delete_topics.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topicId: topicId }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            if (parsedUser.createdPosts !== undefined) {
+              parsedUser.createdPosts = parsedUser.createdPosts.filter(
+                (id) => id !== topicId
+              );
+              localStorage.setItem("user", JSON.stringify(parsedUser));
             }
-          })
-          .catch((error) => {
-            console.error("Error in deleting topic:", error);
-            alert("An error occurred. Please check console logs.");
-          });
-          setRefresh(!refresh);
-        alert("Manager wants to delete post"); 
-      }else{
-        if(parsedUser.createdPosts !== undefined){
-          console.log(topicId); 
-          if(parsedUser.createdPosts.includes(topicId)){
-              fetch("http://localhost:8000/Posts/delete_topics.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify( {topicId:topicId, UserID: parsedUser.id}),
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                    if(parsedUser.createdPosts !== undefined){
-                      parsedUser.createdPosts =  parsedUser.createdPosts.filter(id => id !== topicId);
-                      localStorage.setItem("user", JSON.stringify(parsedUser));
-                      setRefresh(!refresh);
-                  } else {
-                    alert("Failed to delete topic: " + data.message);
-                  }
-                })
-                .catch((error) => {
-                  console.error("Error in deleting topic:", error);
-                  alert("An error occurred. Please check console logs.");
-                });
-            alert("You want to delete your own post");
-          }else{
-            alert("You cannot delete a post you did not create");  
+          } else {
+            alert("Failed to delete topic: " + data.message);
           }
-        }else{
-          alert("You haven't created any post you are able to delete")
+        })
+        .catch((error) => {
+          console.error("Error in deleting topic:", error);
+          alert("An error occurred. Please check console logs.");
+        });
+      setRefresh(!refresh);
+      alert("Manager wants to delete post");
+    } else {
+      if (parsedUser.createdPosts !== undefined) {
+        console.log(topicId);
+        if (parsedUser.createdPosts.includes(topicId)) {
+          fetch("http://localhost:8000/Posts/delete_topics.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ topicId: topicId, UserID: parsedUser.id }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (parsedUser.createdPosts !== undefined) {
+                parsedUser.createdPosts = parsedUser.createdPosts.filter(
+                  (id) => id !== topicId
+                );
+                localStorage.setItem("user", JSON.stringify(parsedUser));
+                setRefresh(!refresh);
+              } else {
+                alert("Failed to delete topic: " + data.message);
+              }
+            })
+            .catch((error) => {
+              console.error("Error in deleting topic:", error);
+              alert("An error occurred. Please check console logs.");
+            });
+          alert("You want to delete your own post");
+        } else {
+          alert("You cannot delete a post you did not create");
         }
+      } else {
+        alert("You haven't created any post you are able to delete");
       }
     }
+  };
   const handleAddComment = (topicId, commentText) => {
     if (commentText) {
       const updatedComments = [...(comments[topicId] || []), commentText];
@@ -236,7 +243,6 @@ const Topics = () => {
   const handleExpandTopic = (topic) => {
     setExpandedTopic(topic);
   };
-
 
   const handleCloseExpandedTopic = () => {
     setExpandedTopic(null);
@@ -254,11 +260,6 @@ const Topics = () => {
   return (
     <div className="main-topics-container">
       <main className="topics-content">
-        <div className="user-info">
-          <FontAwesomeIcon icon={faBell} className="bell-icon" />
-          <Avatar name="Alice" round={true} size="50" color="#0a6476" />
-        </div>
-
         <h1 className="topics-header">POSTS</h1>
 
         {/* Filter Buttons */}
@@ -292,7 +293,9 @@ const Topics = () => {
                   )}
                   <h2>{topic.title}</h2>
                   <p>{topic.content}</p>
-                  <span className={`category-label ${topic.category.toLowerCase()}`}>
+                  <span
+                    className={`category-label ${topic.category.toLowerCase()}`}
+                  >
                     {topic.category}
                   </span>
 
@@ -338,7 +341,9 @@ const Topics = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <h2>{expandedTopic.title}</h2>
-              <span className={`category-label ${expandedTopic.category.toLowerCase()}`}>
+              <span
+                className={`category-label ${expandedTopic.category.toLowerCase()}`}
+              >
                 {expandedTopic.category}
               </span>
               <p>{expandedTopic.content}</p>
@@ -415,7 +420,9 @@ const Topics = () => {
                   Technical
                 </button>
                 <button
-                  className={newTopicCategory === "Non-Technical" ? "selected" : ""}
+                  className={
+                    newTopicCategory === "Non-Technical" ? "selected" : ""
+                  }
                   onClick={() => setNewTopicCategory("Non-Technical")}
                 >
                   Non-Technical

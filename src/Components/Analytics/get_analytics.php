@@ -1,27 +1,10 @@
 <?php
-// Enable error reporting for debugging
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // Set headers to allow cross-origin requests
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json; charset=UTF-8');
 header('Access-Control-Allow-Methods: GET');
 
-// Database connection
-$servername = "sci-project.lboro.ac.uk"; // Remote host
-$username = "team010";  // Database username
-$password = "KsMzcqzsYEbKw4UWyvVT";  // Database password
-$database = "team010"; // Database name
-
-$conn = new mysqli($servername, $username, $password, $database);
-
-// Check connection
-if ($conn->connect_error) {
-  echo json_encode(["error" => "Database connection failed: " . $conn->connect_error]);
-  exit;
-}
+require_once('../../../backend/config/db.php');
 
 // Fetch employee task summary + detailed tasks per employee
 $sql = "

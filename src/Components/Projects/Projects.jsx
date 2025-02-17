@@ -3,50 +3,49 @@ import "./Projects.css"; // Keep the same CSS
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import Avatar from "react-avatar";
-import Sidebar from "../Sidebar/Sidebar.jsx"; // Import Sidebar component
-import { useNavigate } from 'react-router-dom'; // Correctly import useNavigate
+import { useNavigate } from "react-router-dom"; // Correctly import useNavigate
 //const [userRole, setUserRole] = useState(""); // Store the user role
 
 const Projects = () => {
-  const navigate = useNavigate();  // useNavigate hook inside the component
-  const [projects, setProjects] = useState([]);  // Fetch projects state
-  const [activeProject, setActiveProject] = useState(null);  // Active project state
-  const [loading, setLoading] = useState(true);  // Loading state
-  const [isModalOpen, setIsModalOpen] = useState(false);  // Modal state
-  const [employees, setEmployees] = useState([]);  // Employees state
-  const [formData, setFormData] = useState({ // Form data state for the Add Project form
+  const navigate = useNavigate(); // useNavigate hook inside the component
+  const [projects, setProjects] = useState([]); // Fetch projects state
+  const [activeProject, setActiveProject] = useState(null); // Active project state
+  const [loading, setLoading] = useState(true); // Loading state
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [employees, setEmployees] = useState([]); // Employees state
+  const [formData, setFormData] = useState({
+    // Form data state for the Add Project form
     title: "",
     description: "",
     teamLeader: "",
     teamMembers: [],
     tasks: [],
-    milestones: [] 
+    milestones: [],
   });
   const user = JSON.parse(localStorage.getItem("user"));
 
-if (user) {
-  console.log("User ID:", user.id);
-  console.log("User Role:", user.role);
-} else {
-  console.log("No user found in localStorage.");
-}
-
+  if (user) {
+    console.log("User ID:", user.id);
+    console.log("User Role:", user.role);
+  } else {
+    console.log("No user found in localStorage.");
+  }
 
   // Handle Add Project click
   const handleAddProjectClick = () => {
-    navigate('/add-project');  // Navigate to Add Project page
+    navigate("/add-project"); // Navigate to Add Project page
   };
 
   // Fetch projects and employees
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-  
+
     if (!user || !user.id) {
       console.error("No user found in localStorage.");
       return;
     }
-  
-    fetch(`http://localhost:8000/get_projects.php?UserID=${user.id}`)
+
+    fetch(`http://localhost:8000/Projects/get_projects.php?UserID=${user.id}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.projects) {
@@ -59,6 +58,34 @@ if (user) {
       })
       .catch((error) => console.error("Error fetching projects:", error));
   }, []);
+
+  const deleteProject = (projectId) => {
+    const storedUser = localStorage.getItem("user");
+    const parsedUser = JSON.parse(storedUser);
+
+    if (parsedUser.role === 1) {
+      fetch(`http://localhost:8000/Projects/delete_projects.php`, {
+        method: "POST", // Change from DELETE to POST
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project_id: projectId }), // Send project_id in body
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          if (data.status === "success") {
+            alert("Project deleted successfully");
+            setProjects((prevProjects) =>
+              prevProjects.filter((project) => project.id !== projectId)
+            );
+          } else {
+            alert("Failed to delete project");
+          }
+        })
+        .catch((error) => console.error("Error:", error));
+    } else {
+      alert("You do not have permission to delete projects.");
+    }
+  };
 
   // Handle selecting a project
   const handleProjectSelect = (project) => {
@@ -75,7 +102,7 @@ if (user) {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -84,7 +111,7 @@ if (user) {
     const { value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      teamMembers: [...prevData.teamMembers, value]
+      teamMembers: [...prevData.teamMembers, value],
     }));
   };
 
@@ -93,7 +120,7 @@ if (user) {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      tasks: [...prevData.tasks, { [name]: value }]
+      tasks: [...prevData.tasks, { [name]: value }],
     }));
   };
 
@@ -102,14 +129,14 @@ if (user) {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      milestones: [...prevData.milestones, { [name]: value }]
+      milestones: [...prevData.milestones, { [name]: value }],
     }));
   };
 
   // Handle form submit
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("http://localhost:8000/add_project.php", {
+    fetch("http://localhost:8000/Projects/add_project.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -139,25 +166,23 @@ if (user) {
       <h1 className="projects-header">PROJECTS</h1>
       <div className="projects-page-wrapper">
         <div className="projects-sidebar">
-          <div className="user-info">
-            <FontAwesomeIcon icon={faBell} className="bell-icon" />
-            <Avatar name="Alice" round={true} size="50" color="#0a6476" />
-          </div>
           <h4 className="projects-title-header">Project Titles</h4>
           {projects.map((project) => (
             <button
               key={project.id}
-              className={`project-title-button ${activeProject?.id === project.id ? "active" : ""}`}
+              className={`project-title-button ${
+                activeProject?.id === project.id ? "active" : ""
+              }`}
               onClick={() => handleProjectSelect(project)}
             >
               {project.title}
             </button>
           ))}
           <div>
-    {user?.role === "manager" && (
-      <button onClick={handleAddProjectClick}>+ Add Project</button>
-    )}
-  </div>
+            {user.role === 1 && (
+              <button onClick={handleAddProjectClick}>+ Add Project</button>
+            )}
+          </div>
         </div>
 
         <div className="project-info-content">
@@ -177,7 +202,8 @@ if (user) {
                       <div className={`team-member-avatar avatar-color-1`}>
                         {activeProject.teamLeader.name.charAt(0)}
                       </div>
-                      <strong>{activeProject.teamLeader.name}</strong> - <span>Team Leader</span>
+                      <strong>{activeProject.teamLeader.name}</strong> -{" "}
+                      <span>Team Leader</span>
                     </div>
                   ) : (
                     <p>No team leader assigned.</p>
@@ -188,7 +214,11 @@ if (user) {
                   <ul className="team-list">
                     {activeProject.teamMembers.map((member, index) => (
                       <li key={index} className="team-member">
-                        <div className={`team-member-avatar avatar-color-${index % 4 + 1}`}>
+                        <div
+                          className={`team-member-avatar avatar-color-${
+                            (index % 4) + 1
+                          }`}
+                        >
                           {member.name.charAt(0)}
                         </div>
                         <strong>{member.name}</strong>
@@ -202,26 +232,46 @@ if (user) {
                 <h3>Tasks Outline</h3>
                 <ul>
                   {activeProject.tasks.map((task, index) => (
-                    <li key={index}>{task.description} (Status: {task.status})</li>
+                    <li key={index}>
+                      {task.description} (Status: {task.status})
+                    </li>
                   ))}
                 </ul>
               </div>
 
               <div className="tasks-completed-box">
                 <h3>Project Timeline</h3>
+                {/* <div
+                  onClick={deleteProject(activeProject.id)}
+                  style={{ cursor: "pointer" }}
+                >
+                  delete -
+                </div> */}
                 <div className="hori-timeline" dir="ltr">
                   <ul className="list-inline events">
                     {activeProject.milestones.map((milestone, index) => (
                       <li key={index} className="list-inline-item event-list">
                         <div className="px-4">
                           <div
-                            className={`event-date bg-soft-${milestone.status === "Completed" ? "success text-success" : "warning text-warning"}`}
+                            className={`event-date bg-soft-${
+                              milestone.status === "Completed"
+                                ? "success text-success"
+                                : "warning text-warning"
+                            }`}
                           >
-                            {new Date(milestone.start_date).toLocaleDateString()}
+                            {new Date(
+                              milestone.start_date
+                            ).toLocaleDateString()}
                           </div>
-                          <h5 className="font-size-16">{milestone.milestone}</h5>
+                          <h5 className="font-size-16">
+                            {milestone.milestone}
+                          </h5>
                           <p className="text-muted">
-                            {`Starts: ${new Date(milestone.start_date).toLocaleDateString()} | Ends: ${new Date(milestone.end_date).toLocaleDateString()}`}
+                            {`Starts: ${new Date(
+                              milestone.start_date
+                            ).toLocaleDateString()} | Ends: ${new Date(
+                              milestone.end_date
+                            ).toLocaleDateString()}`}
                           </p>
                           <p>Status: {milestone.status}</p>
                         </div>
@@ -236,8 +286,7 @@ if (user) {
           )}
         </div>
       </div>
-      <div>
-         </div>
+      <div></div>
     </div>
   );
 };

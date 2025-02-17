@@ -5,9 +5,6 @@ import "./Projects.css";
 const user = JSON.parse(localStorage.getItem("user"));
 const userID = user ? user.id : null; // Assuming user.id holds the userID
 
-
-
-
 const AddProject = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -34,7 +31,7 @@ const AddProject = () => {
 
   // Fetch employees when the component mounts
   useEffect(() => {
-    fetch("http://localhost:8000/get_employees.php")
+    fetch("http://localhost:8000/Projects/get_employees.php")
       .then((response) => response.json())
       .then((data) => {
         setEmployees(data.employees || []); // Ensure employees is an array
@@ -48,7 +45,7 @@ const AddProject = () => {
   // Handle form field changes
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
-  
+
     if (type === "checkbox") {
       setFormData((prevData) => ({
         ...prevData,
@@ -79,7 +76,7 @@ const AddProject = () => {
       alert("Please fill in all phase details.");
       return;
     }
-  
+
     setFormData((prevData) => ({
       ...prevData,
       projectPhases: [
@@ -87,7 +84,7 @@ const AddProject = () => {
         { ...phase, status: "Not Started" },
       ],
     }));
-  
+
     // Reset fields after adding phase
     setPhase({
       name: "",
@@ -95,18 +92,18 @@ const AddProject = () => {
       endDate: "",
     });
   };
-  
+
   const addTask = () => {
     if (!task.description || !task.assignedTo || !task.dueDate) {
       alert("Please fill in all task details.");
       return;
     }
-  
+
     setFormData((prevData) => ({
       ...prevData,
       tasks: [...prevData.tasks, { ...task, status: "Pending" }], // Default status
     }));
-  
+
     // Reset task input fields
     setTask({
       description: "",
@@ -119,13 +116,13 @@ const AddProject = () => {
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevents default form behavior
     console.log("Submitting formData:", formData);
-  
+
     // Ensure at least one phase or task exists
     if (formData.projectPhases.length === 0 && formData.tasks.length === 0) {
       alert("You must add at least one phase or task before submitting.");
       return;
     }
-  
+
     // Create assignments array based on the teamLeader and teamMembers
     const assignments = [
       { project_id: 0, employee_id: formData.teamLeader, is_team_leader: true }, // Add team leader assignment
@@ -135,18 +132,18 @@ const AddProject = () => {
         is_team_leader: false,
       })),
     ];
-  
+
     // Add the assignments to formData for submission
     const projectData = {
       ...formData,
       assignments,
-      userID // Add the assignments data
+      userID, // Add the assignments data
     };
-  
+
     console.log("Submitting project data:", projectData);
-  
+
     // Send project data to the PHP backend
-    fetch("http://localhost:8000/add_project.php", {
+    fetch("http://localhost:8000/Projects/add_project.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(projectData), // Make sure projectData includes all required fields
@@ -173,7 +170,6 @@ const AddProject = () => {
         alert("An error occurred. Please check console logs.");
       });
   };
-  
 
   return (
     <div className="project-page">
@@ -182,18 +178,34 @@ const AddProject = () => {
         <div className="project-info-box">
           <label>
             Project Title:
-            <input type="text" name="title" value={formData.title} onChange={handleFormChange} required />
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleFormChange}
+              required
+            />
           </label>
           <label>
             Project Description:
-            <textarea name="description" value={formData.description} onChange={handleFormChange} required />
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleFormChange}
+              required
+            />
           </label>
         </div>
 
         <div className="team-info-box">
           <label>
             Team Leader:
-            <select name="teamLeader" value={formData.teamLeader} onChange={handleFormChange} required>
+            <select
+              name="teamLeader"
+              value={formData.teamLeader}
+              onChange={handleFormChange}
+              required
+            >
               <option value="">Select Team Leader</option>
               {employees?.map((employee) => (
                 <option key={employee.id} value={employee.id}>
@@ -207,12 +219,12 @@ const AddProject = () => {
             <label>Team Members:</label>
             <div
               style={{
-                maxHeight: '200px',
-                overflowY: 'auto',
-                border: '1px solid #ccc',
-                padding: '0.5rem',
-                boxSizing: 'border-box',
-                marginBottom: '1rem',
+                maxHeight: "200px",
+                overflowY: "auto",
+                border: "1px solid #ccc",
+                padding: "0.5rem",
+                boxSizing: "border-box",
+                marginBottom: "1rem",
               }}
             >
               {employees.map((employee) => (
@@ -224,9 +236,11 @@ const AddProject = () => {
                     value={employee.id}
                     checked={formData.teamMembers.includes(employee.id)}
                     onChange={handleFormChange}
-                    style={{ marginRight: '8px' }}
+                    style={{ marginRight: "8px" }}
                   />
-                  <label htmlFor={`team-member-${employee.id}`}>{employee.name}</label>
+                  <label htmlFor={`team-member-${employee.id}`}>
+                    {employee.name}
+                  </label>
                 </div>
               ))}
             </div>
@@ -295,9 +309,8 @@ const AddProject = () => {
             {formData.tasks.map((t, index) => (
               <li key={index}>
                 <strong>{t.description}</strong> – Assigned to:{" "}
-                {employees.find((emp) => emp.id === t.assignedTo)?.name} – Category:{" "}
-                {t.category}{" "}
-                {t.dueDate && `– Due: ${t.dueDate}`}
+                {employees.find((emp) => emp.id === t.assignedTo)?.name} –
+                Category: {t.category} {t.dueDate && `– Due: ${t.dueDate}`}
               </li>
             ))}
           </ul>
@@ -342,7 +355,8 @@ const AddProject = () => {
           <ul>
             {formData.projectPhases.map((phase, index) => (
               <li key={index}>
-                {phase.name} (Start: {phase.startDate}, End: {phase.endDate}, Status: {phase.status})
+                {phase.name} (Start: {phase.startDate}, End: {phase.endDate},
+                Status: {phase.status})
               </li>
             ))}
           </ul>

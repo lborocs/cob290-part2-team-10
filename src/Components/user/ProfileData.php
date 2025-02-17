@@ -9,15 +9,15 @@ $response = array();
 
 // Handle preflight request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
+  http_response_code(200);
+  exit();
 }
 
 // Database credentials
 $servername = "sci-project.lboro.ac.uk"; //localhost
-$username = "team010"; 
-$password = "KsMzcqzsYEbKw4UWyvVT"; 
-$dbname = "team010"; 
+$username = "team010";
+$password = "KsMzcqzsYEbKw4UWyvVT";
+$dbname = "team010";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -64,4 +64,3 @@ if ($result->num_rows > 0) {
 }
 
 $conn->close();
-?>

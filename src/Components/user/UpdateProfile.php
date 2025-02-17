@@ -28,13 +28,13 @@ $conn = new mysqli($servername, $username, $password, $database);
 
 // Check database connection
 if ($conn->connect_error) {
-  $response["status"] = "error";
-  $response["message"] = "Connection failed: " . $conn->connect_error;
-  echo json_encode($response);
-  exit(); // Exit after sending error response
+    $response["status"] = "error";
+    $response["message"] = "Connection failed: " . $conn->connect_error;
+    echo json_encode($response);
+    exit(); // Exit after sending error response
 } else {
-  $response["status"] = "success";
-  $response["message"] = "Database connected successfully";
+    $response["status"] = "success";
+    $response["message"] = "Database connected successfully";
 }
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -74,4 +74,3 @@ if ($stmt->execute()) {
 // Close statement and database connection
 $stmt->close();
 $conn->close();
-?>

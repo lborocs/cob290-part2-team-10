@@ -51,7 +51,7 @@ const Analytics = () => {
 
   //Use effect for the backlog function
   useEffect(() => {
-    fetch(`http://localhost:8000/get_analytics.php`)
+    fetch(`http://localhost:8000/Analytics/get_analytics.php`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -86,7 +86,7 @@ const Analytics = () => {
 
   // Fetch all project names & IDs
   useEffect(() => {
-    fetch(`http://localhost:8000/allProjects.php`)
+    fetch(`http://localhost:8000/Analytics/allProjects.php`)
       .then((response) => response.json())
       .then((data) => {
         if (data.projects) {
@@ -103,7 +103,7 @@ const Analytics = () => {
       console.log(`Fetching project details for ID: ${selectedProject}`);
 
       fetch(
-        `http://localhost:8000/allTasks.php?project_id=${encodeURIComponent(
+        `http://localhost:8000/Analytics/allTasks.php?project_id=${encodeURIComponent(
           selectedProject
         )}`
       )
@@ -125,7 +125,7 @@ const Analytics = () => {
 
   //Use effect for rating analysis
   useEffect(() => {
-    fetch(`http://localhost:8000/ratings.php`)
+    fetch(`http://localhost:8000/Analytics/ratings.php`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -142,7 +142,7 @@ const Analytics = () => {
 
   //Use effect for the Employee Task overview
   useEffect(() => {
-    fetch(`http://localhost:8000/get_analytics.php`)
+    fetch(`http://localhost:8000/Analytics/get_analytics.php`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -171,16 +171,6 @@ const Analytics = () => {
       {/* Header */}
       <div className="top-bar">
         <span className="header-text">Manager Dashboard</span>
-        <div className="user-avatar">
-          <FontAwesomeIcon icon={faBell} className="bell-icon" />
-          <Avatar
-            name="Alice"
-            round={true}
-            size="50"
-            color="#0a6476"
-            textColor="#333"
-          />
-        </div>
       </div>
       <main className="analytics-content">
         {/* Backlog Card */}

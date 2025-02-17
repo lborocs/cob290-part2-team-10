@@ -94,9 +94,10 @@ const Sidebar = ({ show, toggle, role, onLogout }) => {
               <span>My Projects</span>
             </Link>
           </li>
-
+          {/* const storedUser = localStorage.getItem("user"); const parsedUser =
+          JSON.parse(storedUser); console.log("Hello" + parsedUser.role); */}
           {/* Conditionally render the Analytics link based on the role */}
-          {role === "Manager" && (
+          {JSON.parse(localStorage.getItem("user")).role === 1 && (
             <li
               className={`sidebar-item ${
                 activeLink === "/analytics" ? "active-link" : ""

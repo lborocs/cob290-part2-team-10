@@ -152,7 +152,6 @@
   padding: 8px 12px;
 }
 
-
 .actions button:hover {
   background-color: #ecf2f5;
   color: #0a6476;
@@ -231,7 +230,6 @@
   display: inline-block; /* Prevents flex/grid stretch */
   max-width: 60px; /* Ensures it never expands beyond this */
 }
-
 
 .floating-button.clicked {
   background-color: #616161;
@@ -402,7 +400,10 @@ button {
 /* Responsive Grid */
 @media (max-width: 1200px) {
   .topics-grid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Adjust columns dynamically */
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(220px, 1fr)
+    ); /* Adjust columns dynamically */
     width: 85vw;
   }
 }
@@ -413,18 +414,23 @@ button {
     width: 90vw;
   }
 
-  .topics-header, .topics-content {
+  .topics-header,
+  .topics-content {
     font-size: 28px;
   }
 }
 
 @media (max-width: 768px) {
   .topics-grid {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ensure at least 2 cards per row */
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(250px, 1fr)
+    ); /* Ensure at least 2 cards per row */
     width: 95vw;
   }
 
-  .topics-header, .topics-content {
+  .topics-header,
+  .topics-content {
     font-size: 24px;
   }
 
@@ -447,11 +453,15 @@ button {
 
 @media (max-width: 480px) {
   .topics-grid {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Ensure 1 card per row */
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(150px, 1fr)
+    ); /* Ensure 1 card per row */
     width: 98vw;
   }
 
-  .topics-header, .topics-content {
+  .topics-header,
+  .topics-content {
     font-size: 20px;
   }
 
@@ -469,4 +479,3 @@ button {
     height: 70vh;
   }
 }
-

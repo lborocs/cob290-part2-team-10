@@ -1,25 +1,16 @@
 <?php
-header("Access-Control-Allow-Origin: *"); // Or specify frontend URL
-header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, OPTIONS, GET"); // Ensure OPTIONS is handled for preflight requests
+header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow Authorization header if needed
+header("Access-Control-Allow-Credentials: true"); // Allow credentials if using sessions or cookies
+header("Content-Type: application/json");  // Ensure JSON response format
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] == "OPTIONS") {
     http_response_code(200);
     exit();
 }
-
-$servername = "sci-project.lboro.ac.uk";
-$username = "team010";
-$password = "KsMzcqzsYEbKw4UWyvVT";
-$database = "team010";
-
-$conn = new mysqli($servername, $username, $password, $database);
-
-if ($conn->connect_error) {
-    die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
-}
+require_once('../../../backend/config/db.php');
 
 $sql = "SELECT UserID, Name FROM Employee";
 $result = $conn->query($sql);
@@ -32,4 +23,3 @@ while ($row = $result->fetch_assoc()) {
 echo json_encode(["employees" => $employees]);
 
 $conn->close();
-?>

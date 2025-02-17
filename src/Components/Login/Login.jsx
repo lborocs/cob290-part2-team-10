@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
 import "./auth.css";
 
-
 const Login = ({ onLoginSuccess }) => {
   const [isRegister, setIsRegister] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -23,9 +22,9 @@ const Login = ({ onLoginSuccess }) => {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setError("");
-  
+
     console.log("Sending data to PHP:", { Email: email, Password: password });
-  
+
     try {
       const response = await fetch("http://localhost:8000/Login/Login2.php", {
         method: "POST",
@@ -42,7 +41,6 @@ const Login = ({ onLoginSuccess }) => {
       if (data.status === "success") {
         const userRole = data.user.role === "manager" ? "manager" : "employee"; // Ensure role mapping
 
-
         localStorage.setItem("user", JSON.stringify(data.user)); // Store user data in localStorage
         onLoginSuccess(userRole);
         navigate("/home");
@@ -57,7 +55,7 @@ const Login = ({ onLoginSuccess }) => {
 
   const validatePassword = () => {
     if (
-      password.length >= 8 &&  // Minimum length of 8
+      password.length >= 8 && // Minimum length of 8
       /[A-Z]/.test(password) && // At least one uppercase letter
       /[a-z]/.test(password) && // At least one lowercase letter
       /[0-9]/.test(password) && // At least one number
@@ -69,150 +67,174 @@ const Login = ({ onLoginSuccess }) => {
         setError("Passwords need to match");
       }
     } else {
-      setError("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+      setError(
+        "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+      );
     }
   };
-  
-  
-  const validateEmail  = async (e) => {
+
+  const validateEmail = async (e) => {
     e.preventDefault();
-    console.log("Sending register validateemail data to PHP:", { Email: email, Password: password, Name: name, Username: username});
-    var test = true; 
+    console.log("Sending register validateemail data to PHP:", {
+      Email: email,
+      Password: password,
+      Name: name,
+      Username: username,
+    });
+    var test = true;
     try {
       // Fetch registered emails from the backend
-      const response = await fetch("http://localhost:8000/Login/RegistrationVerification.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ Email: email }) ,
-      });
-  
-      const data = await response.json(); 
-      
+      const response = await fetch(
+        "http://localhost:8000/Login/RegistrationVerification.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ Email: email }),
+        }
+      );
+
+      const data = await response.json();
+
       if (data.status === "error") {
         setError("Registration unsuccessful: " + data.message);
-        test=false;
+        test = false;
       }
       console.log(data);
       console.log(data.exists);
       if (!data.exists) {
-             // Check if email is valid (must end with @make-it-all.com)
-    if (email.endsWith("@make-it-all.com")) {
-      console.log("Sending register validateemail data to PHP2:", { Email: email, Password: password, Name: name, Username: username});
-      test=false; // Invalid email format
-      validatePassword();
-    }else{
-      setError("Registration unsuccessful: Email must end with @make-it-all.com");
-    }
-      }
-      else{
+        // Check if email is valid (must end with @make-it-all.com)
+        if (email.endsWith("@make-it-all.com")) {
+          console.log("Sending register validateemail data to PHP2:", {
+            Email: email,
+            Password: password,
+            Name: name,
+            Username: username,
+          });
+          test = false; // Invalid email format
+          validatePassword();
+        } else {
+          setError(
+            "Registration unsuccessful: Email must end with @make-it-all.com"
+          );
+        }
+      } else {
         console.log("128 log", data);
-        setError("Registration unsuccessful: Email already registered" );
-        return true; 
+        setError("Registration unsuccessful: Email already registered");
+        return true;
       }
-    
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Error checking email:", error);
       setError("An error occurred while checking email. Please try again.");
-      test=false;
+      test = false;
     }
-    return test
+    return test;
   };
-  
 
-  const handleRegisterSubmit = async () =>{
+  const handleRegisterSubmit = async () => {
     setError("");
-      try {
-        const response = await fetch("http://localhost:8000/Login/Registration.php", {
+    try {
+      const response = await fetch(
+        "http://localhost:8000/Login/Registration.php",
+        {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ Email: email, Password: password, UserName: username, Name: name }), // Match PHP expected keys
-        });
-    
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          body: JSON.stringify({
+            Email: email,
+            Password: password,
+            UserName: username,
+            Name: name,
+          }), // Match PHP expected keys
         }
-    
-        const data = await response.json();
-    
-        if (data.db_status) {
-          console.log("Database Status:", data.db_status);
-        } else {
-          console.warn("Database status not received.");
-        }
-    
-        if (data.status === "success") {
-          console.log("Registration successful");
-          console.log("User details:", data.user);
-    
-          localStorage.setItem("user", JSON.stringify(data.user)); // Store user data
-          onLoginSuccess(data.user.role);
-          navigate("/home");
-        } else {
-          setError(data.error || "Login failed");
-          console.error("Login failed:", data.error);
-        }
-      } catch (error) {
-        console.error("Fetch error:", error.message);
-        setError("A network error occurred. Please try again.");
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
+
+      const data = await response.json();
+
+      if (data.db_status) {
+        console.log("Database Status:", data.db_status);
+      } else {
+        console.warn("Database status not received.");
+      }
+
+      if (data.status === "success") {
+        console.log("Registration successful");
+        console.log("User details:", data.user);
+
+        localStorage.setItem("user", JSON.stringify(data.user)); // Store user data
+        onLoginSuccess(data.user.role);
+        navigate("/home");
+      } else {
+        setError(data.error || "Login failed");
+        console.error("Login failed:", data.error);
+      }
+    } catch (error) {
+      console.error("Fetch error:", error.message);
+      setError("A network error occurred. Please try again.");
+    }
   };
 
   const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccessMessage("");
-  
+
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/; //ensured password is of right format
-  // ensures user submits  something into text field before update is made
+    // ensures user submits  something into text field before update is made
     if (!email) {
       setError("Please enter your email.");
       return;
     }
-  
+
     if (!newPassword || !confirmPassword) {
       setError("Please enter a new password and confirm it.");
       return;
     }
-  
+
     if (!passwordRegex.test(newPassword)) {
-      setError("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character.");
+      setError(
+        "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character."
+      );
       return;
     }
-  
+
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
-  
+
     try {
-      const response = await fetch("http://localhost:8000/Login/ForgotPassword.php", {
+      const response = await fetch(
+        "http://localhost:8000/Login/ForgotPassword.php",
+        {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, newPassword }),
-      });
-  
+        }
+      );
+
       const data = await response.json();
-  
+
       if (data.status === "success") {
-          setSuccessMessage("Password changed successfully.");
-          setIsForgotPassword(false);
+        setSuccessMessage("Password changed successfully.");
+        setIsForgotPassword(false);
       } else if (data.error === "Email not found") {
-          setError("This account does not exist. Please check your email and try again.");
+        setError(
+          "This account does not exist. Please check your email and try again."
+        );
       } else {
-          setError(data.error || "Failed to reset password.");
+        setError(data.error || "Failed to reset password.");
       }
-  } catch (error) {
-      setError("An error occurred while resetting your password. Please try again.");
-  }
-}
-  
-  
-  
-  
+    } catch (error) {
+      setError(
+        "An error occurred while resetting your password. Please try again."
+      );
+    }
+  };
 
   return (
     <div className="container">
@@ -243,14 +265,14 @@ const Login = ({ onLoginSuccess }) => {
                 : handleLoginSubmit
             }
           >
-             <input
+            <input
               type="text"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="input-field"
             />
-              {!isForgotPassword && (
+            {!isForgotPassword && (
               <input
                 type="password"
                 placeholder="Password"
@@ -260,29 +282,29 @@ const Login = ({ onLoginSuccess }) => {
               />
             )}
             {isRegister && (
-               <div>
-               <input
-                 type="text"
-                 placeholder="Name"
-                 value={name}
-                 onChange={(e) => setName(e.target.value)}
-                 className="input-field"
-               />
-               <input
-                 type="text"
-                 placeholder="Username"
-                 value={username}
-                 onChange={(e) => setUserName(e.target.value)} 
-                 className="input-field"
-               />
-               <input
-                 type="password"
-                 placeholder="Confirm Password"
-                 value={confirmPassword}
-                 onChange={(e) => setConfirmPassword(e.target.value)}
-                 className="input-field"
-               />
-             </div>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="input-field"
+                />
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUserName(e.target.value)}
+                  className="input-field"
+                />
+                <input
+                  type="password"
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="input-field"
+                />
+              </div>
             )}
 
             {isForgotPassword && (
@@ -328,7 +350,12 @@ const Login = ({ onLoginSuccess }) => {
             ) : (
               <>
                 Don’t have an account?{" "}
-                <span onClick={() => {setIsRegister(true)}} className="link">
+                <span
+                  onClick={() => {
+                    setIsRegister(true);
+                  }}
+                  className="link"
+                >
                   Register Here
                 </span>
               </>

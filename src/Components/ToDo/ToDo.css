@@ -39,6 +39,7 @@
   min-height: 300px;
   max-height: 600px;
   overflow-y: auto;
+  background-color: #c7cccc;
 }
 
 /* Task styling */

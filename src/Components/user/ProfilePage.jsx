@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar/Sidebar.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
-import { faUserCircle } from "@fortawesome/free-solid-svg-icons"; 
+import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import Avatar from "react-avatar";
 import "./ProfilePage.css";
 
@@ -15,15 +15,17 @@ const ProfilePage = ({ isAdmin }) => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({email:"",preferredName:"", position:""});
+  const [profileData, setProfileData] = useState({
+    email: "",
+    preferredName: "",
+    position: "",
+  });
   const [userEmail, setUserEmail] = useState("");
   const [storedPreferredName, setstoredPreferredName] = useState("");
-  const [userId, setUserId] = useState(null);  // Initialise state with null or an empty value
+  const [userId, setUserId] = useState(null); // Initialise state with null or an empty value
   const [loading, setLoading] = useState(false); // Added loading state
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
- 
-
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -39,12 +41,11 @@ const ProfilePage = ({ isAdmin }) => {
       console.warn("No user found in localStorage.");
     }
   }, []);
-  
-  
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (!userId) return; // Ensure email is set before fetching
-  
+
       try {
         console.log("Fetching profile data for UserID:", userId);
         const response = await fetch(
@@ -54,14 +55,14 @@ const ProfilePage = ({ isAdmin }) => {
           console.error("User ID missing");
           return;
         }
-  
+
         if (!response.ok) {
           throw new Error("Failed to fetch profile");
         }
-  
+
         const data = await response.json();
         // Check if the response status is 'success' before setting the profile data
-        if (data.status === 'success') {
+        if (data.status === "success") {
           setProfileData({
             preferredName: data.user.preferredName, // Use stored name if available
             email: data.user.email,
@@ -74,34 +75,34 @@ const ProfilePage = ({ isAdmin }) => {
         console.error("Error fetching profile:", error);
       }
     };
-  
+
     fetchProfile();
   }, [userId]); // Re-fetch when userId is set
-  
-  
 
-  
   const handleSaveProfile = async () => {
     try {
       const dataToSend = {
         UserID: user.id,
         PreferredName: profileData?.preferredName,
       };
-      const response = await fetch('http://localhost:8000/user/UpdateProfile.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSend),
-      });
-  
+      const response = await fetch(
+        "http://localhost:8000/user/UpdateProfile.php",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataToSend),
+        }
+      );
+
       const data = await response.json();
-  
-      if (data.status === 'success') {
+
+      if (data.status === "success") {
         setIsEditing(false); // Exit editing mode
         console.log("Profile saved successfully");
       } else {
-        console.error("Failed to save profile:", data.error || 'Unknown error');
+        console.error("Failed to save profile:", data.error || "Unknown error");
       }
     } catch (error) {
       console.error("Error saving profile:", error);
@@ -123,13 +124,17 @@ const ProfilePage = ({ isAdmin }) => {
       alert("Password must be at least 8 characters long.");
       return;
     }
-    if (!/[A-Z]/.test(newPassword) || 
-        !/[a-z]/.test(newPassword) || 
-        !/[0-9]/.test(newPassword) || 
-        !/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
-      alert("Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+    if (
+      !/[A-Z]/.test(newPassword) ||
+      !/[a-z]/.test(newPassword) ||
+      !/[0-9]/.test(newPassword) ||
+      !/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)
+    ) {
+      alert(
+        "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character."
+      );
       return;
-        }
+    }
 
     if (!userId) {
       alert("UserID not found. Please refresh the page.");
@@ -140,24 +145,27 @@ const ProfilePage = ({ isAdmin }) => {
     try {
       const payload = {
         UserID: userId,
-        newPassword: newPassword
-    };
-    // This will log the properly formatted JSON string
+        newPassword: newPassword,
+      };
+      // This will log the properly formatted JSON string
       console.log("Payload being sent:", JSON.stringify(payload));
 
-     console.log("Payload being sent:", payload);
-      const response = await fetch("http://localhost:8000/user/ChangePassword.php", {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json;',
-        },
-        body: JSON.stringify(payload),
-      });
+      console.log("Payload being sent:", payload);
+      const response = await fetch(
+        "http://localhost:8000/user/ChangePassword.php",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json;",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const data = await response.json();
       console.log({
         UserID: userId,
-        newPassword: newPassword
+        newPassword: newPassword,
       });
       if (data.status === "success") {
         alert("Password changed successfully!");
@@ -173,21 +181,29 @@ const ProfilePage = ({ isAdmin }) => {
       setLoading(false);
     }
   };
-  
 
-//if(){}
+  //if(){}
   return (
     <div className="profile-main">
       <div className="profile-page-container">
         <div className="user-info">
           <FontAwesomeIcon icon={faBell} className="bell-icon" />
-          <Avatar name={profileData.preferredName || "User"} round={true} size="50" color="#0a6476" />
+          <Avatar
+            name={profileData.preferredName || "User"}
+            round={true}
+            size="50"
+            color="#0a6476"
+          />
         </div>
         <h1 className="profilepage-title">User Profile</h1>
         <div className="profile-grid-container">
           <div className="profile-user-profile">
             <div className="profile-user-image">
-      <FontAwesomeIcon icon={faUserCircle} size="5x" className="user-profile-icon" />
+              <FontAwesomeIcon
+                icon={faUserCircle}
+                size="5x"
+                className="user-profile-icon"
+              />
             </div>
             <div className="user-change-details">
               <div className="profile-user-details">
@@ -205,14 +221,14 @@ const ProfilePage = ({ isAdmin }) => {
                       onChange={(e) =>
                         setProfileData((prev) => ({
                           ...prev,
-                          preferredName: e.target.value, //update preferred name in state 
+                          preferredName: e.target.value, //update preferred name in state
                         }))
                       }
                     />
                   ) : (
-                   <div>
-                    <span>{profileData.preferredName || "N/A"}</span>
-                   </div> 
+                    <div>
+                      <span>{profileData.preferredName || "N/A"}</span>
+                    </div>
                   )}
                 </div>
                 <div>
@@ -220,9 +236,11 @@ const ProfilePage = ({ isAdmin }) => {
                   {profileData.position || "N/A"}
                 </div>
                 {isEditing ? (
-                  <button onClick={handleSaveProfile}>Save</button> //save button to save the changes 
+                  <button onClick={handleSaveProfile}>Save</button> //save button to save the changes
                 ) : (
-                  <button onClick={() => setIsEditing(true)}>Edit Profile</button> // Edit button to switch to the editting mode
+                  <button onClick={() => setIsEditing(true)}>
+                    Edit Profile
+                  </button> // Edit button to switch to the editting mode
                 )}
               </div>
 
@@ -244,11 +262,15 @@ const ProfilePage = ({ isAdmin }) => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
-                  <i onClick={() => setShowConfirmPassword(!showConfirmPassword)}>👁</i>
-                  </div>
+                  <i
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    👁
+                  </i>
+                </div>
                 <button onClick={handlePasswordChange} disabled={loading}>
-        {loading ? "Changing..." : "Change Password"}
-      </button>
+                  {loading ? "Changing..." : "Change Password"}
+                </button>
               </div>
             </div>
           </div>

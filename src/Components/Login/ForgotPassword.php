@@ -7,19 +7,7 @@ header("Access-Control-Allow-Credentials: true"); // Allow credentials if using 
 header("Content-Type: application/json");  // Ensure JSON response format
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
-// Database credentials
-$servername = "sci-project.lboro.ac.uk";
-$username = "team010";
-$password = "KsMzcqzsYEbKw4UWyvVT";
-$database = "team010";
-
-$conn = new mysqli($servername, $username, $password, $database);
-
-if ($conn->connect_error) {
-    die(json_encode(["status" => "error", "error" => "Database connection failed"]));
-}
-
+require_once('../../../backend/config/db.php');
 // Read the request body
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -56,4 +44,3 @@ if ($updateStmt->execute()) {
 }
 
 $conn->close();
-?>

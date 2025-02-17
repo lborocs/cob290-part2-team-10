@@ -28,13 +28,13 @@ $rawData = file_get_contents("php://input");
 error_log("Raw Data: " . $rawData);
 // Get data from POST request
 
-$data = json_decode($rawData, true);  
+$data = json_decode($rawData, true);
 
 if (!$data) {
   echo json_encode([
-      "error" => "Invalid JSON received",
-      "data" => file_get_contents("php://input"),
-      "json_error" => json_last_error_msg() // Get detailed error message
+    "error" => "Invalid JSON received",
+    "data" => file_get_contents("php://input"),
+    "json_error" => json_last_error_msg() // Get detailed error message
 
   ]);
   exit();
@@ -49,8 +49,8 @@ $newPassword = $data["newPassword"];
 
 // Validate password length (for example, minimum of 8 characters)
 if (strlen($newPassword) < 8) {
-    echo json_encode(["status" => "error", "error" => "Password must be at least 8 characters long"]);
-    exit();
+  echo json_encode(["status" => "error", "error" => "Password must be at least 8 characters long"]);
+  exit();
 }
 
 $checkQuery = "SELECT UserID, Password FROM Employee WHERE UserID = ?";
@@ -62,8 +62,8 @@ $user = $result->fetch_assoc();
 $stmtCheck->close();
 
 if (!$user) {
-    echo json_encode(["status" => "error", "error" => "User not found in the database"]);
-    exit();
+  echo json_encode(["status" => "error", "error" => "User not found in the database"]);
+  exit();
 }
 
 // Hash the new password securely
@@ -76,9 +76,9 @@ $stmt->bind_param("si", $hashedPassword, $userID);
 
 if ($stmt->execute()) {
   if ($stmt->affected_rows > 0) {
-      echo json_encode(["status" => "success", "message" => "Password updated successfully"]);
+    echo json_encode(["status" => "success", "message" => "Password updated successfully"]);
   } else {
-      echo json_encode(["status" => "error", "error" => "No rows updated. UserID might not exist."]);
+    echo json_encode(["status" => "error", "error" => "No rows updated. UserID might not exist."]);
   }
 } else {
   echo json_encode(["status" => "error", "error" => "Failed to update password"]);
@@ -87,4 +87,3 @@ if ($stmt->execute()) {
 
 $stmt->close();
 $conn->close();
-?>

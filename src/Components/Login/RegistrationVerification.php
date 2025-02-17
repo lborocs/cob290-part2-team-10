@@ -10,35 +10,17 @@ ini_set('display_errors', 1);
 
 // Handle preflight OPTIONS request (important for CORS)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
+  http_response_code(200);
+  exit();
 }
 
-
-// Database credentials
-$servername = "sci-project.lboro.ac.uk";
-$username = "team010";
-$password = "KsMzcqzsYEbKw4UWyvVT";
-$database = "team010";
-
-// Connect to MySQL
-$conn = new mysqli($servername, $username, $password, $database);
-
-// Check connection
-if ($conn->connect_error) {
-    die(json_encode([
-        "status" => "error", 
-        "error" => "Database connection failed",
-        "db_status" => "not_connected"  
-    ]));
-}
-
+require_once('../../../backend/config/db.php');
 // Get JSON input from request
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (!isset($data["Email"])) {
-    echo json_encode(["status" => "error", "message" => "Email parameter missing"]);
-    exit();
+  echo json_encode(["status" => "error", "message" => "Email parameter missing"]);
+  exit();
 }
 
 $email = $conn->real_escape_string($data["Email"]);
@@ -58,4 +40,3 @@ if ($result) {
 
 //connection closed
 $conn->close();
-?>

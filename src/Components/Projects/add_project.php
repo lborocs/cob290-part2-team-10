@@ -15,21 +15,7 @@ $data = json_decode(file_get_contents("php://input"), true);
 if (isset($data["userID"])) {
     $_SESSION["userID"] = $data["userID"];  // Store userID in session
 }
-
-$servername = "sci-project.lboro.ac.uk";
-$username = "team010";
-$password = "KsMzcqzsYEbKw4UWyvVT";
-$database = "team010";
-
-// Enable detailed error reporting for debugging
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-$conn = new mysqli($servername, $username, $password, $database, 3306);
-if ($conn->connect_error) {
-    echo json_encode(["success" => false, "message" => "Connection failed: " . $conn->connect_error]);
-    exit();
-}
-
+require_once('../../../backend/config/db.php');
 // Validate the incoming data
 if (!$data) {
     echo json_encode(["success" => false, "message" => "Invalid JSON data received."]);
@@ -93,7 +79,7 @@ foreach ($assignments as $assignment) {
     $query = "INSERT INTO ProjectAssignments (project_id, employee_id, is_team_leader) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("iii", $projectId, $employeeId, $isTeamLeader);
-    
+
     if (!$stmt->execute()) {
         $response["success"] = false;
         $response["message"] = "Error adding assignment: " . $stmt->error;
@@ -130,4 +116,3 @@ if (!empty($tasks)) {
 
 // Final JSON response
 echo json_encode($response);
-?>
