@@ -15,6 +15,7 @@ import Posts from "./Components/Posts/Topics";
 import ProfilePage from "./Components/user/ProfilePage";
 import Sidebar from "./Components/Sidebar/Sidebar";
 import Analytics from "./Components/Analytics/Analytics";
+import AddProject from "./Components/Projects/AddProject";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -31,13 +32,11 @@ function App() {
     setIsAuthenticated(false);
     setRole(null);
   };
-
+  const storedUser = localStorage.getItem("user");
+  const parsedUser = JSON.parse(storedUser);
   const toggleSidebar = () => {
     setShowSidebar((prevShow) => !prevShow);
   };
-
-  // Determine if the user is an admin based on role
-  const isAdmin = role === "Manager";
 
   return (
     <div className="App">
@@ -61,13 +60,15 @@ function App() {
               <>
                 <Route path="/home" element={<Home />} />
                 <Route path="/projects" element={<Projects />} />
-                {isAdmin && <Route path="/analytics" element={<Analytics />} />}
+                {parsedUser.role === 1 && (
+                  <Route path="/analytics" element={<Analytics />} />
+                )}
+                {parsedUser.role === 1 && (
+                  <Route path="/add-project" element={<AddProject />} />
+                )}
                 <Route path="/todo" element={<ToDoList />} />
                 {/* Pass isAdmin prop to ProfilePage */}
-                <Route
-                  path="/profile"
-                  element={<ProfilePage isAdmin={isAdmin} />}
-                />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/topics" element={<Posts />} />
               </>
             ) : (
