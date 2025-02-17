@@ -26,7 +26,7 @@ const Login = ({ onLoginSuccess }) => {
     console.log("Sending data to PHP:", { Email: email, Password: password });
 
     try {
-      const response = await fetch("http://35.197.222.231/Login/Login2.php", {
+      const response = await fetch("35.197.222.231/Login/Login2.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ Email: email, Password: password }), // Match PHP expected keys
@@ -85,7 +85,7 @@ const Login = ({ onLoginSuccess }) => {
     try {
       // Fetch registered emails from the backend
       const response = await fetch(
-        "http://35.197.222.231/Login/RegistrationVerification.php",
+        "35.197.222.231/Login/RegistrationVerification.php",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -134,7 +134,7 @@ const Login = ({ onLoginSuccess }) => {
     setError("");
     try {
       const response = await fetch(
-        "http://35.197.222.231/Login/Registration.php",
+        "35.197.222.231/Login/Registration.php",
         {
           method: "POST",
           headers: {
@@ -209,7 +209,7 @@ const Login = ({ onLoginSuccess }) => {
 
     try {
       const response = await fetch(
-        "http://35.197.222.231/Login/ForgotPassword.php",
+        "35.197.222.231/Login/ForgotPassword.php",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
