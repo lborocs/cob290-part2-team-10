@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-require_once('../../../backend/config/db.php');
+require_once('/var/www/html/cob290-part2-team-10/backend/config/db.php');
 // Read JSON input from React frontend
 $rawData = file_get_contents("php://input");
 error_log("Received raw data: " . $rawData);  // Log raw data to error log 
