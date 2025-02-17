@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Database credentials
-$servername = "sci-project.lboro.ac.uk"; //localhost
+$servername = "localhost"; //localhost
 $username = "team010";
 $password = "KsMzcqzsYEbKw4UWyvVT";
 $dbname = "team010";
