@@ -1,8 +1,8 @@
 <?php
 // Allow cross-origin requests (for local development)
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, OPTIONS"); // Ensure OPTIONS is handled for preflight requests
-header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow Authorisation header if needed
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS, DELETE, PUT");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Credentials: true"); // Allow credentials if using sessions or cookies
 header("Content-Type: application/json");  // Ensure JSON response format
 error_reporting(E_ALL);
