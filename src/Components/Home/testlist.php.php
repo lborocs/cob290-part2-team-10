@@ -26,8 +26,8 @@ enum Taskstatus: string {
 }
 #$role = taskstatus::todo->value;
 
-$empID=$_GET[empID] ;#json_decode(file_get_contents("php://input"));
-#$empID=2;
+$empID=$_GET['empID'] ;#json_decode(file_get_contents("php://input"));
+##$empID=2;
 $query= "Select * from `To-Do-List` where `employeeID`=".$empID ; 
 
  #employeeid (needs querying to compare, task id, titl, desc,progr,deadl)
@@ -41,11 +41,8 @@ $tryjsoning=array();
            $a=array(   'employeeID'=>$row[0], 'TaskID'=>$row[1], 'title'=>$row[2], 'description'=>$row[3],    'currentProgress'=>$row[4], 'deadline'=>$row[5] );
           $tryjsoning[$i]=$a;
 
-
-         # echo "$row[2]"; 
     }
       
-     
     mysqli_close($conn); 
 
   } catch(exception) {
