@@ -39,10 +39,7 @@ while($row=mysqli_fetch_array($res)) {
 #group/filter by status where if comlpleted/not. results needed for bar chart
   mysqli_close($conn);
 $i=0;
-foreach($tryjsoning as $x=>$y){
-  $l[$i]=$y;
-  $i++;
-}
+
 $q=json_encode($l);
 echo $q;  
 ?>
