@@ -7,7 +7,7 @@ header("Content-Type: application/json");
 $response = array();
 
 // Connect to the database
-$servername = "localhost";
+$servername = "sci-project.lboro.ac.uk";
 $username = "team010";
 $password = "KsMzcqzsYEbKw4UWyvVT";
 $database = "team010";
