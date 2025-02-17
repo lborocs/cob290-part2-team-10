@@ -105,8 +105,7 @@ useEffect(() => {
   catch(exception){
   // console.log(listdata.length)
   }
-///console.log("a");
-  //######
+   //######
 const projectData = [ ];//for posts
 var n=0;
 try{
