@@ -1,6 +1,6 @@
   <?php
   // Database configuration
-  $servername = "localhost";
+  $servername = "sci-project.lboro.ac.uk";
   $username = "team010";
   $password = "KsMzcqzsYEbKw4UWyvVT";
   $database = "team010";
